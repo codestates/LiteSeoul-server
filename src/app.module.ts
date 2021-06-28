@@ -1,16 +1,21 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { User } from './models/user. model';
-import { Like } from './models/like. model';
-import { Visit } from './models/visit. model';
-import { Receipt } from './models/receipt. model';
-import { Shop } from './models/shop. model';
+import { User } from './models/user.model';
+import { Like } from './models/like.model';
+import { Visit } from './models/visit.model';
+import { Receipt } from './models/receipt.model';
+import { Shop } from './models/shop.model';
 import { Comment } from './models/comment.model';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Connection } from 'typeorm';
+import { UserController } from './user/user.controller';
+import { UserService } from './user/user.service';
+import { ShopController } from './shop/shop.controller';
+import { ShopService } from './shop/shop.service';
 
 require("dotenv").config();
+
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -24,8 +29,8 @@ require("dotenv").config();
       synchronize: true,
     }),
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, UserController, ShopController],
+  providers: [AppService, UserService, ShopService],
 })
 export class AppModule {
   constructor(private connection: Connection) {}

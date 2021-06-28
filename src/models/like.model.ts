@@ -1,6 +1,6 @@
 import { Entity, Column, CreateDateColumn, UpdateDateColumn, PrimaryGeneratedColumn, BaseEntity, ManyToOne, } from 'typeorm';
-import { Shop } from './shop. model';
-import { User } from './user. model';
+import { Shop } from './shop.model';
+import { User } from './user.model';
 
 
 @Entity()
