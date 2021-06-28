@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, BaseEntity, OneToMany, } from 'typeorm';
-import { Like } from './like. model';
+import { Like } from './like.model';
 
 @Entity()
 export class User extends BaseEntity {
