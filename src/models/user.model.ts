@@ -4,41 +4,45 @@ import { Like } from './like.model';
 @Entity()
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id: string;
+  id: number;
 
   @Column()
-  name: string;
+  name?: string;
 
   @Column()
-  email: string;
+  password?: string;
 
   @Column()
-  nick: string;
+  email?: string;
 
   @Column()
-  salt: string;
+  nick?: string;
 
   @Column()
-  snsId: string;
+  salt?: string;
 
   @Column()
-  profileImgPath: string;
+  snsId?: string;
 
   @Column()
-  profileText: string;
+  profileImgPath?: string;
 
   @Column()
-  level: number;
+  profileText?: string;
 
   @Column()
-  currentExp: number;
+  level?: number;
 
   @Column()
-  maxExp: number;
+  currentExp?: number;
+
+  @Column()
+  maxExp?: number;
 
   @CreateDateColumn()
-  created_at: Date;
+  created_at?: Date;
 
   @UpdateDateColumn()
-  updated_at: Date;
+  updated_at?: Date;
+
 }
