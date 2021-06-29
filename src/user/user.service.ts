@@ -32,7 +32,7 @@ export class UserService {
 		// 이메일이 존재하는 지 확인. 존재하면 돌려보내
 		let existEmail = await this.userRepository.findOne({ email })
 		if (existEmail) {
-			return '이미 존재하는 이메일입니다@@@@@@@@@@@@@@@@';
+			return '이미 존재하는 이메일입니다@@@@@@@@@@@@@@@@----------------------------------------feat/test4';
 		} else {
 			// 비밀번호 해싱
 			const salt = await bcrypt.genSalt(); // 솔트
