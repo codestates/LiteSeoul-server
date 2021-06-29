@@ -13,6 +13,8 @@ import { UserController } from './user/user.controller';
 import { UserService } from './user/user.service';
 import { ShopController } from './shop/shop.controller';
 import { ShopService } from './shop/shop.service';
+import { KakaoController } from './kakao/kakao.controller';
+import { KakaoService } from './kakao/kakao.service';
 
 require("dotenv").config();
 
@@ -29,8 +31,8 @@ require("dotenv").config();
       synchronize: true,
     }),
   ],
-  controllers: [AppController, UserController, ShopController],
-  providers: [AppService, UserService, ShopService],
+  controllers: [AppController, UserController, ShopController, KakaoController],
+  providers: [AppService, UserService, ShopService, KakaoService],
 })
 export class AppModule {
   constructor(private connection: Connection) {}
