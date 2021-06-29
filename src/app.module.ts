@@ -30,6 +30,7 @@ require("dotenv").config();
       entities: [User, Like, Visit, Receipt, Shop, Comment],
       synchronize: true,
     }),
+    TypeOrmModule.forFeature([User]),
   ],
   controllers: [AppController, UserController, ShopController, KakaoController],
   providers: [AppService, UserService, ShopService, KakaoService],

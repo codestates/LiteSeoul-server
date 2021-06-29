@@ -1,4 +1,5 @@
-import { Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
+import { User } from 'src/models/user.model';
 import { UserService } from './user.service';
 
 @Controller('user')
@@ -25,9 +26,17 @@ export class UserController {
 	}
 
 	// 회원가입
-	@Post('signup')
-	signUp() {
-		return this.userService.signUp();
-	}
+	// @Post('signup')
+	// signUp(
+	// 	@Body('email') email: string,
+	// 	@Body('password') password: string,
+	// 	@Body('name') name: string,
+	// 	@Body('nick') nick: string,) {
+	// 	return this.userService.signUp(email, password, name, nick);
+	// }
 
+	@Post('signup')
+	signUp(@Body() userInfo: User) {
+		return this.userService.signUp(userInfo);
+	}
 }
