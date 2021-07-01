@@ -13,10 +13,10 @@ import { UserController } from './user/user.controller';
 import { UserService } from './user/user.service';
 import { ShopController } from './shop/shop.controller';
 import { ShopService } from './shop/shop.service';
-import { KakaoController } from './kakao/kakao.controller';
-import { KakaoService } from './kakao/kakao.service';
+import { UserModule } from './user/user.module';
+import { KakaoModule } from './kakao/kakao.module';
 
-require("dotenv").config();
+require('dotenv').config();
 
 @Module({
   imports: [
@@ -31,10 +31,10 @@ require("dotenv").config();
       synchronize: true,
     }),
     TypeOrmModule.forFeature([User]),
+    UserModule,
+    KakaoModule,
   ],
-  controllers: [AppController, UserController, ShopController, KakaoController],
-  providers: [AppService, UserService, ShopService, KakaoService],
+  controllers: [AppController, ShopController],
+  providers: [AppService, ShopService],
 })
-export class AppModule {
-  constructor(private connection: Connection) {}
-}
+export class AppModule {}
