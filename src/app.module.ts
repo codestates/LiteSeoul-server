@@ -8,13 +8,9 @@ import { Receipt } from './models/receipt.model';
 import { Shop } from './models/shop.model';
 import { Comment } from './models/comment.model';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Connection } from 'typeorm';
-import { UserController } from './user/user.controller';
-import { UserService } from './user/user.service';
-import { ShopController } from './shop/shop.controller';
-import { ShopService } from './shop/shop.service';
 import { UserModule } from './user/user.module';
 import { KakaoModule } from './kakao/kakao.module';
+import { ShopModule } from './shop/shop.module';
 
 require('dotenv').config();
 
@@ -30,11 +26,12 @@ require('dotenv').config();
       entities: [User, Like, Visit, Receipt, Shop, Comment],
       synchronize: true,
     }),
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, Shop, Like, Comment, Visit, Receipt]),
     UserModule,
     KakaoModule,
+    ShopModule,
   ],
-  controllers: [AppController, ShopController],
-  providers: [AppService, ShopService],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}

@@ -1,5 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, BaseEntity, OneToMany, } from 'typeorm';
 import { Like } from './like.model';
+import { Receipt } from './receipt.model';
+import { Visit } from './visit.model';
 
 @Entity()
 export class User extends BaseEntity {
@@ -44,5 +46,15 @@ export class User extends BaseEntity {
 
   @UpdateDateColumn()
   updated_at?: Date;
+
+  // ======================================== 관계 설정
+  @OneToMany(() => Like, (like) => like.user)
+  like: Like[];
+
+  @OneToMany(() => Visit, visit => visit.user)
+  visit: Visit[];
+
+  @OneToMany(() => Receipt, receipt => receipt.user)
+  receipt: Receipt[];
 
 }

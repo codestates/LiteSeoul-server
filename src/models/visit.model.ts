@@ -5,20 +5,15 @@ import { User } from './user.model';
 
 @Entity()
 export class Visit extends BaseEntity {
+  // ======================================== 컬럼
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(
-    (type) => User,
-    (user) => user.id,
-  )
-  user: User;
+  @Column()
+  userId: number;
 
-  @ManyToOne(
-    (type) => Shop,
-    (shop) => shop.id,
-  )
-  shop: Shop;
+  @Column()
+  shopId: number;
 
   @Column()
   visitCnt: number;
@@ -28,4 +23,11 @@ export class Visit extends BaseEntity {
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  // ======================================== 관계 설정
+  @ManyToOne(() => User, (user) => user.visit)
+  user: User;
+
+  @ManyToOne(() => Shop, (shop) => shop.visit)
+  shop: Shop;
 }
