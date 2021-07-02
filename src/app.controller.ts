@@ -1,4 +1,5 @@
-import { Controller, Get, Header, Query, Res } from '@nestjs/common';
+import { Controller, Get, Header, Post, Query, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { AppService } from './app.service';
 require("dotenv").config();
 
@@ -12,6 +13,13 @@ export class AppController {
   getHello(): string {
     return this.appService.getHello();
   }
+
+  @Post('user/upload')
+	@UseInterceptors(FileInterceptor('image'))
+	uploadFile(@UploadedFile() file) {
+		console.log(file)
+		return file;
+	}
 
   // @Get('googleLogin')
   // @Header('Content-Type', 'text/html')
