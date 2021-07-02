@@ -1,12 +1,17 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { Shop } from 'src/models/shop.model';
-// import { Shop } from 'src/models/shop.model';
 import { ShopService } from './shop.service';
+import fs from 'fs';
+
+
+
+
+
 
 @Controller('shop')
 export class ShopController {
 
-	constructor(private readonly shopService: ShopService) { }
+	constructor(private readonly shopService: ShopService) {}
 	
 	// 랭킹: 샵
 	@Get('rank')
@@ -30,6 +35,12 @@ export class ShopController {
 	@Post('likeToggle') 
 	likeToggle(@Body() likeInfo: any) {
 		return this.shopService.likeToggle(likeInfo);
+	}
+
+	// 댓글 달기
+	@Post('comment')
+	writeComment(@Body() commentInfo: any) {
+		return this.shopService.writeComment(commentInfo);
 	}
 
 	// 샵 추천 --- near, recycle, antiPlastic, antiChemical
