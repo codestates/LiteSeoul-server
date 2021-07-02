@@ -12,11 +12,11 @@ import { UserModule } from './user/user.module';
 import { KakaoModule } from './kakao/kakao.module';
 import { ShopModule } from './shop/shop.module';
 import { MulterModule } from '@nestjs/platform-express';
-
-require('dotenv').config();
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: process.env.DATABASE_HOST,
