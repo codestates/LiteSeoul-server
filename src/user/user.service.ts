@@ -5,6 +5,7 @@ import * as bcrypt from 'bcrypt';
 
 import { User } from '../models/user.model';
 import { JwtService } from '@nestjs/jwt';
+import { basename } from 'path';
 
 @Injectable()
 export class UserService {
@@ -47,7 +48,7 @@ export class UserService {
   signOut() {}
 
   // 회원가입
-  async signUp(Body) {
+  async signUp(Body, File) {
     const { email, password, name, nick } = Body;
 
     // 이메일이 존재하는 지 확인. 존재하면 돌려보내
@@ -58,7 +59,8 @@ export class UserService {
       // 비밀번호 해싱
       const salt = await bcrypt.genSalt(); // 솔트
       const hashedPaword = await bcrypt.hash(password, salt);
-
+      const profileImgPath = `${process.env.SERVER_URL}/uploads/${File.originalname}`;
+      console.log(profileImgPath);
       await this.userRepository.save({
         email,
         password: hashedPaword,
@@ -66,6 +68,7 @@ export class UserService {
         nick,
         snsId: 'local',
         salt,
+        profileImgPath,
       });
     }
   }
