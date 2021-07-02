@@ -1,7 +1,8 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { Shop } from 'src/models/shop.model';
 import { ShopService } from './shop.service';
 import fs from 'fs';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 
 
@@ -48,6 +49,12 @@ export class ShopController {
 	getShopsByRecommend(@Body() userInfo: any) {
 		return this.shopService.getShopsByRecommend(userInfo);
 	}
-	
 
+	// testMulter
+	@Post('image')
+	@UseInterceptors(FileInterceptor('image'))
+	uploadFile(@UploadedFile() file) {
+		console.log(file)
+		return file;
+	}
 }

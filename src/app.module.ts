@@ -11,6 +11,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
 import { KakaoModule } from './kakao/kakao.module';
 import { ShopModule } from './shop/shop.module';
+import { MulterModule } from '@nestjs/platform-express';
 
 require('dotenv').config();
 
@@ -30,6 +31,9 @@ require('dotenv').config();
     UserModule,
     KakaoModule,
     ShopModule,
+    MulterModule.register({
+      dest: './uploads'
+    })
   ],
   controllers: [AppController],
   providers: [AppService],
