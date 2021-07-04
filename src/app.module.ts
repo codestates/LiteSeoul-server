@@ -12,6 +12,7 @@ import { UserModule } from './user/user.module';
 import { KakaoModule } from './kakao/kakao.module';
 import { ShopModule } from './shop/shop.module';
 import { ConfigModule } from '@nestjs/config';
+import { ReceiptModule } from './receipt/receipt.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { ConfigModule } from '@nestjs/config';
     UserModule,
     KakaoModule,
     ShopModule,
+    ReceiptModule,
   ],
   controllers: [AppController],
   providers: [AppService],
