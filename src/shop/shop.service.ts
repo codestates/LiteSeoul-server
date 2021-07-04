@@ -122,10 +122,13 @@ export class ShopService {
 				
 				// 댓글 정보
 				entityManager.query(
-					`SELECT 
+					`SELECT
+							c.id,
 							c.userId,
 							c.shopId,
 							c.comment,
+							c.created_at,
+							c.updated_at,
 							u.email,
 							u.name,
 							u.nick
@@ -158,6 +161,16 @@ export class ShopService {
 
 		let recycleList = await getRepository(Shop)
 			.createQueryBuilder('shop')
+			.select([
+				'shop.id',
+				'shop.name',
+				'shop.address',
+				'shop.latitude',
+				'shop.longitude',
+				'shop.category',
+				'shop.recommend',
+				'shop.phone'
+			])
 			.where({ category: categoryName })
 			.getMany();
 
@@ -172,6 +185,9 @@ export class ShopService {
 
 		let likeHistory = await getRepository(Like)
 			.createQueryBuilder('like')
+			.select([
+				'like.id'
+			])
 			.where({ userId, shopId })
 			.getOne();
 		
@@ -220,10 +236,13 @@ export class ShopService {
 		const entityManager = getManager();
 		let writtenComment;
 		await entityManager.query(
-			`SELECT 
+			`SELECT
+					c.id,
 					c.userId,
 					c.shopId,
 					c.comment,
+					c.created_at,
+					c.updated_at,
 					u.email,
 					u.name,
 					u.nick
