@@ -1,6 +1,23 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
-import { User } from 'src/models/user.model';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { readdirSync, mkdirSync } from 'fs';
+import { diskStorage } from 'multer';
+import { extname, basename } from 'path';
 import { UserService } from './user.service';
+
+try {
+  readdirSync('uploads');
+} catch (error) {
+  console.error('uploads 폴더가 없어 uploads 폴더를 생성합니다.');
+  mkdirSync('uploads');
+}
 
 @Controller('user')
 export class UserController {
@@ -24,8 +41,21 @@ export class UserController {
     return this.userService.signOut();
   }
 
+  @UseInterceptors(
+    FileInterceptor('UserImg', {
+      storage: diskStorage({
+        destination(req, file, cb) {
+          cb(null, 'uploads/');
+        },
+        filename(req, file, cb) {
+          cb(null, file.originalname);
+        },
+      }),
+      limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+    }),
+  )
   @Post('signup')
-  signUp(@Body() Body: User) {
-    return this.userService.signUp(Body);
+  signUp(@Body() body, @UploadedFile() file: Express.Multer.File) {
+    return this.userService.signUp(body, file);
   }
 }

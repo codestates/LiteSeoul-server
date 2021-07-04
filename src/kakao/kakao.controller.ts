@@ -3,12 +3,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/models/user.model';
 import { Repository } from 'typeorm';
 import { KakaoService } from './kakao.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Controller('kakao')
 export class KakaoController {
   constructor(
     private readonly kakaoService: KakaoService,
     @InjectRepository(User) private userRepository: Repository<User>,
+    private jwtService: JwtService,
   ) {}
   @Get('login')
   @Header('Content-Type', 'text/html')
@@ -44,7 +46,16 @@ export class KakaoController {
             where: { snsId: e.data.id },
           });
           if (user) {
-            res.send({ message: '이미 존재합니다.' });
+            const { snsId, nick, profileImgPath, email } = user;
+            const payload = {
+              snsId,
+              nick,
+              profileImgPath,
+              email,
+            };
+            const access_token = this.jwtService.sign(payload);
+            console.log(this.jwtService.verify(access_token));
+            res.send({ access_token, payload });
           } else {
             await this.userRepository.save({
               snsId: e.data.id,
@@ -52,14 +63,15 @@ export class KakaoController {
               profileImgPath: e.data.properties.profile_image,
               email: e.data.kakao_account.email,
             });
-            return res.send(`
-              <div>
-                <h2>${e.data.properties.nickname}</h2>
-                <img src=${e.data.properties.profile_image} />
-                <img src=${e.data.properties.thumbnail_image} />
-                <h3>${e.data.kakao_account.email}</h3>
-              </div>
-            `);
+            const payload = {
+              snsId: e.data.id,
+              nick: e.data.properties.nickname,
+              profileImgPath: e.data.properties.profile_image,
+              email: e.data.kakao_account.email,
+            };
+            const access_token = this.jwtService.sign(payload);
+            console.log(this.jwtService.verify(access_token));
+            res.send({ access_token, payload });
           }
         });
       })

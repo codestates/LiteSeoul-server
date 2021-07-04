@@ -11,8 +11,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
 import { KakaoModule } from './kakao/kakao.module';
 import { ShopModule } from './shop/shop.module';
-import { MulterModule } from '@nestjs/platform-express';
 import { ConfigModule } from '@nestjs/config';
+import { ReceiptModule } from './receipt/receipt.module';
 
 @Module({
   imports: [
@@ -31,9 +31,7 @@ import { ConfigModule } from '@nestjs/config';
     UserModule,
     KakaoModule,
     ShopModule,
-    MulterModule.register({
-      dest: './uploads'
-    })
+    ReceiptModule,
   ],
   controllers: [AppController],
   providers: [AppService],

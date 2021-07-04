@@ -1,17 +1,25 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, BaseEntity, ManyToOne, } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  BaseEntity,
+  ManyToOne,
+} from 'typeorm';
 import { User } from './user.model';
-
 
 @Entity()
 export class Receipt extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(
-    (type) => User,
-    (user) => user.id,
-  )
-  user: User;
+  // @ManyToOne(
+  //   (type) => User,
+  //   (user) => user.id,
+  // )
+  @Column()
+  user: number;
 
   @Column()
   imgPath: string;
