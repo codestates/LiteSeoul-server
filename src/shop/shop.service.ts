@@ -24,13 +24,31 @@ export class ShopService {
 
 	// ======================================================================== 랭킹: 샵 ::: GET  /shop/rank
 	async getRank() {
+		console.log('=== GET  /shop/rank');
 		
 		// 사용자 방문 횟수에 따른 랭킹
 		let shopList = await getRepository(Shop)
 			.createQueryBuilder("shop")
-			.leftJoinAndSelect("shop.visit", "visitList")
-			// .leftJoinAndSelect("shop.like", "likeList")
-			.orderBy('visitList.visitCnt', 'DESC')
+			.leftJoinAndSelect("shop.visit", "visit")
+			.leftJoinAndSelect("shop.like", "like")
+			.select([
+				'shop.id',
+				'shop.name',
+				'shop.address',
+				'shop.latitude',
+				'shop.longitude',
+				'shop.category',
+				'shop.recommend',
+				'shop.phone',
+				'visit.id',
+				'visit.userId',
+				'visit.shopId',
+				'visit.visitCnt',
+				'like.id',
+				'like.userId',
+				'like.shopId'
+			])
+			.orderBy('visit.visitCnt', 'DESC')
 			// .limit(8)
 			.getMany();
 		
@@ -55,72 +73,72 @@ export class ShopService {
 			return b['totalPoint'] - a['totalPoint'];
 		})
 
-		console.log(rankedList.length)
 		return rankedList;
 	}
 
 	// ======================================================================== 샵 상세조회 ::: GET  /shop/:id
 	async getShopInfo(paramId) {
 		const { id } = paramId;
+		console.log(`=== GET  /shop/${id}`);
 		let result;
 		let shopInfo;
 		let likeComment;
 		
 		try {
-			// let tmp = await getRepository(Shop)
-			// .createQueryBuilder("shop")
-			// .leftJoinAndSelect("shop.like", "likeList")
-			// .where("shop.id = :id", { id: id })
-			// .getOne();
-
-			// 각각 따로따로 조회 중... 리팩토링 필요...
-			// await this.shopRepository.findOne({ id }).then(data => {
-			// 	shopInfo = data;
-			// });
-
 			// 샵 정보
 			shopInfo = await getRepository(Shop)
 				.createQueryBuilder('shop')
+				.select([
+					'shop.id',
+					'shop.name',
+					'shop.address',
+					'shop.latitude',
+					'shop.longitude',
+					'shop.category',
+					'shop.recommend',
+					'shop.phone'
+				])
 				.where({ id: Number(id) })
 				.getOne();
-			
-			// await this.likeRepository.find({
-			// 	select: ["id", "userId", "shopId"],
-			// 	where: { shopId: Number(id) }
-			// }).then(data => {
-			// 	likeInfo = data;
-			// });
 
 			const entityManager = getManager();
-
 			// 좋아요, 댓글 정보 함께 조회
 			likeComment = await Promise.all([
 				// 좋아요 정보
 				getRepository(Like)
 					.createQueryBuilder('like')
 					.leftJoinAndSelect("like.user", "user")
-					.select(['like.id', 'like.userId', 'like.shopId', 'user.id', 'user.name', 'user.nick', 'user.email'])
+					.select([
+						'like.id',
+						'like.userId',
+						'like.shopId',
+						'user.id',
+						'user.name',
+						'user.nick',
+						'user.email'
+					])
 					.where({ shopId: Number(id) })
 					.getMany(),
 				
 				// 댓글 정보
-				// getRepository(Comment)
-				//   .createQueryBuilder('Comment')
-				//   .where({ shopId: Number(id) })
-				// 	.getMany(),
 				entityManager.query(
-				`SELECT c.userId, c.shopId, c.comment, u.email, u.name, u.nick FROM comment AS c, user AS u WHERE c.shopId = ${Number(id)} AND c.userId = u.id`
+					`SELECT 
+							c.userId,
+							c.shopId,
+							c.comment,
+							u.email,
+							u.name,
+							u.nick
+					FROM
+							comment AS c,
+							user AS u
+					WHERE c.shopId = ${Number(id)} 
+					AND c.userId = u.id`
 				).then(data => {
 					return data;
 				})
 			])
 
-			// await entityManager.query(
-			// 	`select c.userId, c.shopId, c.comment, u.email, u.name from comment c, user u where c.shopId = ${Number(id)} and c.userId = u.id`
-			// 	).then(data => {
-			// 		writtenComment = data[0];
-			// 	})
-			
 			result = {
 				shopInfo: shopInfo,
 				likeInfo: likeComment[0],
@@ -136,7 +154,7 @@ export class ShopService {
 	// ======================================================================== 카테고리별 샵 목록 ::: GET  /shop/category/:categoryName
 	async getShopsByCategory(category) {
 		const { categoryName } = category;
-		console.log(categoryName)
+		console.log(`=== GET  /shop/category/${categoryName}`);
 
 		let recycleList = await getRepository(Shop)
 			.createQueryBuilder('shop')
@@ -149,6 +167,8 @@ export class ShopService {
 	// ======================================================================== 샵 좋아요 ::: POST  /shop/like
 	async likeToggle(likeInfo) {
 		const { userId, shopId } = likeInfo;
+		console.log('=== POST  /shop/like');
+		console.log(`=== @Body()  ${userId}, ${shopId}`);
 
 		let likeHistory = await getRepository(Like)
 			.createQueryBuilder('like')
@@ -182,6 +202,8 @@ export class ShopService {
 	// ======================================================================== 샵 댓글 ::: POST  /shop/comment
 	async writeComment(commentInfo) {
 		const { userId, shopId, comment } = commentInfo;
+		console.log('=== POST  /shop/comment');
+		console.log(`=== @Body()  ${userId}, ${shopId}, ${comment}`);
 
 		// 댓글 입력
 		const tmpComment = await getRepository(Comment)
@@ -198,19 +220,23 @@ export class ShopService {
 		const entityManager = getManager();
 		let writtenComment;
 		await entityManager.query(
-			`SELECT c.userId, c.shopId, c.comment, u.email, u.name, u.nick FROM comment AS c, user AS u WHERE c.id = ${tmpComment.raw.insertId} AND c.userId = u.id limit 1`
+			`SELECT 
+					c.userId,
+					c.shopId,
+					c.comment,
+					u.email,
+					u.name,
+					u.nick
+			FROM
+					comment AS c,
+					user AS u
+			WHERE c.id = ${tmpComment.raw.insertId} 
+			AND c.userId = u.id
+			limit 1`
 			).then(data => {
 				writtenComment = data[0];
 			})
 		
-		// 입력된 댓글 조회
-		// 사용자 정보와 함께 조회
-		// const writtenComment = await getRepository(Comment)
-		// 	.createQueryBuilder('comment')
-		// 	// .leftJoinAndSelect(User, 'user', 'comment.userId = user.id')
-		// 	.where({ id: tmpComment.raw.insertId })
-		// 	.getOne();
-
 		// 댓글 정보 리턴
 		return writtenComment;
 	}
@@ -219,6 +245,8 @@ export class ShopService {
 	// ======================================================================== 샵 추천 ::: POST  /shop/recommend  :::  랜덤 추천 || 사용자 취향에 따른 추천
 	async getShopsByRecommend(userInfo) {
 		const { latitude, longitude, userId } = userInfo;
+		console.log('=== POST  /shop/recommend ');
+		console.log(`=== @Body()  ${latitude}, ${longitude}, ${userId}`);
 		let result: any = {};
 		// 사용자 위치 위도 경도 => 위치 기반 추천 시스템
 
@@ -270,7 +298,19 @@ export class ShopService {
 		const entityManager = getManager();
 		let nearList;
 		await entityManager.query(
-			`SELECT id, name, address, latitude, longitude, category, recommend, phone, (6371*acos(cos(radians(${latitude}))*cos(radians(latitude))*cos(radians(longitude)-radians(${longitude}))+sin(radians(${latitude}))*sin(radians(latitude)))) AS distance FROM shop ORDER BY distance ASC LIMIT 1;`
+			`SELECT 
+					id,
+					name,
+					address,
+					latitude,
+					longitude,
+					category,
+					recommend,
+					phone,
+					(6371*acos(cos(radians(${latitude}))*cos(radians(latitude))*cos(radians(longitude)-radians(${longitude}))+sin(radians(${latitude}))*sin(radians(latitude)))) AS distance 
+			FROM shop
+			ORDER BY distance
+			ASC LIMIT 1;`
 			).then(data => {
 				nearList = data;
 			})
@@ -279,21 +319,48 @@ export class ShopService {
 			// recycle
 			getRepository(Shop)
 			.createQueryBuilder('shop')
-			.select(['shop.id', 'shop.name', 'shop.address', 'shop.latitude', 'shop.longitude', 'shop.category', 'shop.recommend', 'shop.phone'])
+				.select([
+					'shop.id',
+					'shop.name',
+					'shop.address',
+					'shop.latitude',
+					'shop.longitude',
+					'shop.category',
+					'shop.recommend',
+					'shop.phone'
+				])
 			.where({ recommend: 'recycle' })
 				.getMany(),
 			
 			// antiPlastic
 			getRepository(Shop)
 			.createQueryBuilder('shop')
-			.select(['shop.id', 'shop.name', 'shop.address', 'shop.latitude', 'shop.longitude', 'shop.category', 'shop.recommend', 'shop.phone'])
+				.select([
+					'shop.id',
+					'shop.name',
+					'shop.address',
+					'shop.latitude',
+					'shop.longitude',
+					'shop.category',
+					'shop.recommend',
+					'shop.phone'
+				])
 			.where({ recommend: 'antiPlastic' })
 				.getMany(),
 			
 			// antiChemical
 			getRepository(Shop)
 			.createQueryBuilder('shop')
-			.select(['shop.id', 'shop.name', 'shop.address', 'shop.latitude', 'shop.longitude', 'shop.category', 'shop.recommend', 'shop.phone'])
+				.select([
+					'shop.id',
+					'shop.name',
+					'shop.address',
+					'shop.latitude',
+					'shop.longitude',
+					'shop.category',
+					'shop.recommend',
+					'shop.phone'
+				])
 			.where({ recommend: 'antiChemical' })
 			.getMany()
 		])
