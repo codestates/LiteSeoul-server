@@ -27,7 +27,6 @@ import { ReceiptModule } from './receipt/receipt.module';
       entities: [User, Like, Visit, Receipt, Shop, Comment],
       synchronize: true,
     }),
-    TypeOrmModule.forFeature([User, Shop, Like, Comment, Visit, Receipt]),
     UserModule,
     KakaoModule,
     ShopModule,
