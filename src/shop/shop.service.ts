@@ -173,29 +173,29 @@ export class ShopService {
       .getMany();
     
     
-    const arrangedShopList = {
-      cafe: [],
-      life: [],
-      organ: []
-    };
+    // const arrangedShopList = {
+    //   cafe: [],
+    //   life: [],
+    //   organ: []
+    // };
     
-    for (let el of shopList) {
-      switch (el['category']) {
-        case 'cafe':
-          arrangedShopList['cafe'].push(el);
-          break;
+    // for (let el of shopList) {
+    //   switch (el['category']) {
+    //     case 'cafe':
+    //       arrangedShopList['cafe'].push(el);
+    //       break;
         
-        case 'life':
-          arrangedShopList['life'].push(el);
-          break;
+    //     case 'life':
+    //       arrangedShopList['life'].push(el);
+    //       break;
         
-        case 'organ':
-          arrangedShopList['organ'].push(el);
-          break;
-      }
-    }
+    //     case 'organ':
+    //       arrangedShopList['organ'].push(el);
+    //       break;
+    //   }
+    // }
 
-    return arrangedShopList;
+    return shopList;
   }
 
 
