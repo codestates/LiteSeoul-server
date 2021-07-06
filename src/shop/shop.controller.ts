@@ -5,10 +5,6 @@ import fs from 'fs';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 
-
-
-
-
 @Controller('shop')
 export class ShopController {
 
@@ -37,6 +33,12 @@ export class ShopController {
     return this.shopService.getShopsByCategory(category);
   }
 
+  // 자주 방문한 샵 목록
+  @Get('manyVisits/:userId')
+  getManyVisits(@Param() userId: number) {
+    return this.shopService.getManyVisits(userId);
+  }
+
   // 좋아요
   @Post('likeToggle') 
   likeToggle(@Body() likeInfo: any) {
@@ -63,4 +65,3 @@ export class ShopController {
     return file;
   }
 }
-
