@@ -20,18 +20,12 @@ export class UserService {
   // 유저 정보
   async getOne(token) {
     try {
-      const user = await this.jwtService.verify(token);
-      if (user.snsId === 'local') {
-        const info = await this.userRepository.findOne({
-          where: { email: user.email },
-        });
-        return info;
-      } else {
-        const info = await this.userRepository.findOne({
-          where: { snsId: user.snsId },
-        });
-        return info;
-      }
+      const target = await this.jwtService.verify(token);
+      const { id } = target;
+      console.log(id);
+      const user = await this.userRepository.findOne({ id });
+      const { password, salt, ...result } = user;
+      return result;
     } catch (error) {
       throw new UnauthorizedException('유효하지 않은 토큰입니다.');
     }
@@ -55,18 +49,24 @@ export class UserService {
 
   // 로그인
   async signIn(body) {
-    const { email, password } = body;
-    const user = await this.userRepository.findOne({ where: { email } });
-    if (!user) {
-      throw new UnauthorizedException('조회된 사용자 정보가 없습니다.');
-    }
-    const hashedPaword = await bcrypt.hash(password, user.salt);
+    try {
+      const { email, password } = body;
+      const user = await this.userRepository.findOne({ where: { email } });
+      if (!user) {
+        throw new UnauthorizedException('조회된 사용자 정보가 없습니다.');
+      }
+      const hashedPaword = await bcrypt.hash(password, user.salt);
 
-    if (user.password === hashedPaword) {
-      const { password, ...payload } = user;
-      const access_token = this.jwtService.sign(payload);
-      console.log(this.jwtService.verify(access_token));
-      return { access_token, payload };
+      if (user.password === hashedPaword) {
+        let { password, ...payload } = user;
+        const id = user.id;
+        console.log(id);
+        const access_token = this.jwtService.sign({ id });
+        console.log(this.jwtService.verify(access_token));
+        return { access_token, payload };
+      }
+    } catch (err) {
+      console.error(err);
     }
   }
 
@@ -84,17 +84,6 @@ export class UserService {
       const hashedPaword = await bcrypt.hash(password, salt);
       const profileImgPath = `${process.env.SERVER_URL}uploads/${File.originalname}`;
       console.log(profileImgPath);
-      await this.userRepository.save({
-        email,
-        password: hashedPaword,
-        name,
-        nick,
-        phone,
-        snsId: 'local',
-        salt,
-        profileImgPath,
-        maxExp: 500,
-      });
       const result = {
         email,
         password: hashedPaword,
@@ -106,6 +95,7 @@ export class UserService {
         profileImgPath,
         maxExp: 500,
       };
+      await this.userRepository.save(result);
       return result;
     }
   }
@@ -119,8 +109,8 @@ export class UserService {
     if (body.password) {
       const salt = await bcrypt.genSalt(); // 솔트
       const hashedPaword = await bcrypt.hash(body.password, salt);
-      user.salt = salt;
-      user.password = hashedPaword;
+      user['salt'] = salt;
+      user['password'] = hashedPaword;
     }
     if (body.name) {
       user.name = body.name;

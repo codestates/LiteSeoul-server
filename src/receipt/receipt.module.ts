@@ -11,8 +11,8 @@ import { UserService } from 'src/user/user.service';
   imports: [
     TypeOrmModule.forFeature([Receipt, User]),
     JwtModule.register({
-      secret: process.env.JWT_CONSTANTS,
-      signOptions: { expiresIn: '1d' },
+      secretOrPrivateKey: process.env.JWT_CONSTANTS,
+      signOptions: { expiresIn: '1h' },
     }),
   ],
   controllers: [ReceiptController],

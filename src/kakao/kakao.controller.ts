@@ -46,30 +46,28 @@ export class KakaoController {
             where: { snsId: e.data.id },
           });
           if (user) {
-            const { snsId, nick, profileImgPath, email } = user;
-            const payload = {
-              snsId,
-              nick,
-              profileImgPath,
-              email,
-            };
-            const access_token = this.jwtService.sign(payload);
+            const id = user.id;
+            console.log(id);
+            const access_token = this.jwtService.sign({ id });
             console.log(this.jwtService.verify(access_token));
-            res.send({ access_token, payload });
+            res.send({ access_token, user });
           } else {
-            await this.userRepository.save({
-              snsId: e.data.id,
-              nick: e.data.properties.nickname,
-              profileImgPath: e.data.properties.profile_image,
-              email: e.data.kakao_account.email,
-            });
             const payload = {
               snsId: e.data.id,
               nick: e.data.properties.nickname,
               profileImgPath: e.data.properties.profile_image,
               email: e.data.kakao_account.email,
+              maxExp: 500,
             };
-            const access_token = this.jwtService.sign(payload);
+
+            await this.userRepository.save(payload);
+
+            const newUser = await this.userRepository.findOne({
+              where: { snsId: e.data.id },
+            });
+            const id = newUser.id;
+            console.log(id);
+            const access_token = this.jwtService.sign({ id });
             console.log(this.jwtService.verify(access_token));
             res.send({ access_token, payload });
           }

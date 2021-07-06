@@ -21,9 +21,9 @@ export class ReceiptController {
   @Post('list')
   async get(@Body() body) {
     try {
-      const user = await this.jwtService.verify(body.access_token);
-      console.log(user);
-      return this.receiptService.list(body);
+      const target = await this.jwtService.verify(body.access_token);
+      console.log(target.id);
+      return this.receiptService.list(target.id);
     } catch (error) {
       throw new UnauthorizedException('유효하지 않은 토큰입니다.');
     }
