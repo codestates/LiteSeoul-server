@@ -9,7 +9,6 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { readdirSync, mkdirSync } from 'fs';
 import { diskStorage } from 'multer';
-import { extname, basename } from 'path';
 import { UserService } from './user.service';
 
 try {
@@ -29,18 +28,19 @@ export class UserController {
     return this.userService.getRank();
   }
 
+  // 유저 정보
+  @Post('get')
+  async getOne(@Body() body) {
+    return this.userService.getOne(body.access_token);
+  }
+
   // 로그인
   @Post('signin')
   signIn(@Body() body) {
     return this.userService.signIn(body);
   }
 
-  // 로그아웃
-  @Post('signout')
-  signOut() {
-    return this.userService.signOut();
-  }
-
+  // 회원가입
   @UseInterceptors(
     FileInterceptor('UserImg', {
       storage: diskStorage({
@@ -57,5 +57,36 @@ export class UserController {
   @Post('signup')
   signUp(@Body() body, @UploadedFile() file: Express.Multer.File) {
     return this.userService.signUp(body, file);
+  }
+
+  // 회원정보 수정
+  @Post('update')
+  update(@Body() body) {
+    return this.userService.update(body);
+  }
+
+  // 프로필 사진 병경
+  @UseInterceptors(
+    FileInterceptor('UserImg', {
+      storage: diskStorage({
+        destination(req, file, cb) {
+          cb(null, 'uploads/');
+        },
+        filename(req, file, cb) {
+          cb(null, file.originalname);
+        },
+      }),
+      limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+    }),
+  )
+  @Post('profile')
+  changeProfile(@Body() body, @UploadedFile() file: Express.Multer.File) {
+    return this.userService.changeProfile(body.access_token, file);
+  }
+
+  // 회원탈퇴
+  @Post('delete')
+  delete(@Body() body) {
+    return this.userService.delete(body.access_token);
   }
 }
