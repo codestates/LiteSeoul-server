@@ -17,6 +17,26 @@ export class UserService {
     private jwtService: JwtService,
   ) {}
 
+  // 유저 정보
+  async getOne(token) {
+    try {
+      const user = await this.jwtService.verify(token);
+      if (user.snsId === 'local') {
+        const info = await this.userRepository.findOne({
+          where: { email: user.email },
+        });
+        return info;
+      } else {
+        const info = await this.userRepository.findOne({
+          where: { snsId: user.snsId },
+        });
+        return info;
+      }
+    } catch (error) {
+      throw new UnauthorizedException('유효하지 않은 토큰입니다.');
+    }
+  }
+
   // 랭킹: 사용자
   async getRank() {
     const users = await this.userRepository.find();
@@ -50,12 +70,9 @@ export class UserService {
     }
   }
 
-  // 로그아웃
-  signOut() {}
-
   // 회원가입
   async signUp(Body, File) {
-    const { email, password, name, nick } = Body;
+    const { email, password, name, nick, phone } = Body;
 
     // 이메일이 존재하는 지 확인. 존재하면 돌려보내
     let existEmail = await this.userRepository.findOne({ where: { email } });
@@ -81,11 +98,59 @@ export class UserService {
         password: hashedPaword,
         name,
         nick,
+        phone,
         snsId: 'local',
         salt,
         profileImgPath,
+        maxExp: 500,
       };
       return result;
     }
+  }
+
+  // 회원정보 수정
+  async update(body) {
+    const user = await this.getOne(body.access_token);
+    if (body.email) {
+      user.email = body.email;
+    }
+    if (body.password) {
+      const salt = await bcrypt.genSalt(); // 솔트
+      const hashedPaword = await bcrypt.hash(body.password, salt);
+      user.salt = salt;
+      user.password = hashedPaword;
+    }
+    if (body.name) {
+      user.name = body.name;
+    }
+    if (body.nick) {
+      user.nick = body.nick;
+    }
+    if (body.phone) {
+      user.phone = body.phone;
+    }
+    if (body.profileText) {
+      user.profileText = body.profileText;
+    }
+    await this.userRepository.save(user);
+    return user;
+  }
+
+  // 프로필 사진 변경
+  async changeProfile(token, file) {
+    const user = await this.getOne(token);
+    if (file) {
+      const profileImgPath = `${process.env.SERVER_URL}uploads/${file.originalname}`;
+      user.profileImgPath = profileImgPath;
+    }
+    await this.userRepository.save(user);
+    return user;
+  }
+
+  // 회원탈퇴
+  async delete(token) {
+    const user = await this.getOne(token);
+    await this.userRepository.delete({ id: user.id });
+    return { message: '정상적으로 탈퇴되었습니다.' };
   }
 }
