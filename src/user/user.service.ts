@@ -89,9 +89,11 @@ export class UserService {
         password: hashedPaword,
         name,
         nick,
+        phone,
         snsId: 'local',
         salt,
         profileImgPath,
+        maxExp: 500,
       });
       const result = {
         email,

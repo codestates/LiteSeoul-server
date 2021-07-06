@@ -23,7 +23,7 @@ export class ReceiptController {
     try {
       const user = await this.jwtService.verify(body.access_token);
       console.log(user);
-      return this.receiptService.list(user);
+      return this.receiptService.list(body);
     } catch (error) {
       throw new UnauthorizedException('유효하지 않은 토큰입니다.');
     }
@@ -43,13 +43,7 @@ export class ReceiptController {
   )
   @Post('add')
   async add(@Body() body, @UploadedFile() file: Express.Multer.File) {
-    try {
-      const user = await this.jwtService.verify(body.access_token);
-      console.log(user);
-      return this.receiptService.add(user, file);
-    } catch (error) {
-      throw new UnauthorizedException('유효하지 않은 토큰입니다.');
-    }
+    return this.receiptService.add(body, file);
   }
 
   @Post('delete')

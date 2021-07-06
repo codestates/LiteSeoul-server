@@ -5,6 +5,7 @@ import { Receipt } from 'src/models/receipt.model';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { User } from 'src/models/user.model';
+import { UserService } from 'src/user/user.service';
 
 @Module({
   imports: [
@@ -15,6 +16,6 @@ import { User } from 'src/models/user.model';
     }),
   ],
   controllers: [ReceiptController],
-  providers: [ReceiptService],
+  providers: [ReceiptService, UserService],
 })
 export class ReceiptModule {}
