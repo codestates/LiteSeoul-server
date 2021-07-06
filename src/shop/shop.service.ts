@@ -25,51 +25,59 @@ export class ShopService {
     console.log('=== GET  /shop/rank');
     
     // 사용자 방문 횟수에 따른 랭킹
-    let shopList = await getRepository(Shop)
-      .createQueryBuilder("shop")
-      .leftJoinAndSelect("shop.visit", "visit")
-      .leftJoinAndSelect("shop.like", "like")
-      .select([
-        'shop.id',
-        'shop.name',
-        'shop.address',
-        'shop.latitude',
-        'shop.longitude',
-        'shop.category',
-        'shop.recommend',
-        'shop.phone',
-        'visit.id',
-        'visit.userId',
-        'visit.shopId',
-        'visit.visitCnt',
-        'like.id',
-        'like.userId',
-        'like.shopId'
-      ])
-      .orderBy('visit.visitCnt', 'DESC')
-      // .limit(8)
-      .getMany();
-    
-    let cntManyCustomer;
-    let cntPerCustomer;
+    let shopList;
+    let rankedList;
 
-    let rankedList = shopList.map(el => {
-      // 샵에 방문한 사용자 수
-      cntManyCustomer = el.visit.length;
-      // 샵에 방문한 모든 사용자가 방문한 횟수
-      cntPerCustomer = el.visit.reduce((acc, cur) => {
-        return acc + cur.visitCnt;
-      }, 0);
-      
-      // 샵에 totalPoint 추가
-      el["totalPoint"] = cntManyCustomer + cntPerCustomer;
-      return el;
-    })
+    try {
+      shopList = await getRepository(Shop)
+        .createQueryBuilder("shop")
+        .leftJoinAndSelect("shop.visit", "visit")
+        .leftJoinAndSelect("shop.like", "like")
+        .select([
+          'shop.id',
+          'shop.name',
+          'shop.address',
+          'shop.latitude',
+          'shop.longitude',
+          'shop.category',
+          'shop.recommend',
+          'shop.phone',
+          'visit.id',
+          'visit.userId',
+          'visit.shopId',
+          'visit.visitCnt',
+          'like.id',
+          'like.userId',
+          'like.shopId'
+        ])
+        .orderBy('visit.visitCnt', 'DESC')
+        // .limit(8)
+        .getMany();
     
-    // 결과 재배열
-    rankedList.sort((a, b) => {
-      return b['totalPoint'] - a['totalPoint'];
-    })
+      let cntManyCustomer;
+      let cntPerCustomer;
+
+      rankedList = shopList.map(el => {
+        // 샵에 방문한 사용자 수
+        cntManyCustomer = el.visit.length;
+        // 샵에 방문한 모든 사용자가 방문한 횟수
+        cntPerCustomer = el.visit.reduce((acc, cur) => {
+          return acc + cur.visitCnt;
+        }, 0);
+        
+        // 샵에 totalPoint 추가
+        el["totalPoint"] = cntManyCustomer + cntPerCustomer;
+        return el;
+      })
+
+      // 결과 재배열
+      rankedList.sort((a, b) => {
+        return b['totalPoint'] - a['totalPoint'];
+      })
+
+    } catch (e) {
+      throw e;
+    }
 
     return rankedList;
   }
@@ -155,21 +163,25 @@ export class ShopService {
   
   async getAll() {
     console.log(`=== GET  /shop/getAll`);
+    let shopList;
 
-    const shopList = await getRepository(Shop)
-      .createQueryBuilder('shop')
-      .select([
-        'shop.id',
-        'shop.name',
-        'shop.address',
-        'shop.latitude',
-        'shop.longitude',
-        'shop.category',
-        'shop.recommend',
-        'shop.phone'
-      ])
-      .getMany();
-    
+    try {
+      shopList = await getRepository(Shop)
+        .createQueryBuilder('shop')
+        .select([
+          'shop.id',
+          'shop.name',
+          'shop.address',
+          'shop.latitude',
+          'shop.longitude',
+          'shop.category',
+          'shop.recommend',
+          'shop.phone'
+        ])
+        .getMany();
+    } catch (e) {
+      throw e;
+    }
     
     // const arrangedShopList = {
     //   cafe: [],
@@ -201,21 +213,26 @@ export class ShopService {
   async getShopsByCategory(category) {
     const { categoryName } = category;
     console.log(`=== GET  /shop/category/${categoryName}`);
+    let recycleList;
 
-    let recycleList = await getRepository(Shop)
-      .createQueryBuilder('shop')
-      .select([
-        'shop.id',
-        'shop.name',
-        'shop.address',
-        'shop.latitude',
-        'shop.longitude',
-        'shop.category',
-        'shop.recommend',
-        'shop.phone'
-      ])
-      .where({ category: categoryName })
-      .getMany();
+    try {
+      recycleList = await getRepository(Shop)
+        .createQueryBuilder('shop')
+        .select([
+          'shop.id',
+          'shop.name',
+          'shop.address',
+          'shop.latitude',
+          'shop.longitude',
+          'shop.category',
+          'shop.recommend',
+          'shop.phone'
+        ])
+        .where({ category: categoryName })
+        .getMany();
+    } catch (e) {
+      throw e;
+    }
 
     return recycleList;
   }
@@ -225,8 +242,10 @@ export class ShopService {
     let { userId } = userInfo;
     userId = Number(userId);
     console.log(`=== GET  /shop/manyVisits/${userId}`);
-    
-    let visitList = await getRepository(Visit)
+    let visitList = [];
+    let arrangedVisitList;
+
+    visitList = await getRepository(Visit)
       .createQueryBuilder('visit')
       .innerJoinAndSelect("visit.shop", "shop")
       .select([
@@ -250,7 +269,15 @@ export class ShopService {
       return b['visitCnt'] - a['visitCnt'];
     })
 
-    return visitList;
+    // rank 부여
+    arrangedVisitList = visitList.map((el, idx) => {
+      return {
+        ...el,
+        rank: idx + 1
+      }
+    })
+
+    return arrangedVisitList;
   }
 
   // ======================================================================== 샵 좋아요 ::: POST  /shop/like
@@ -258,36 +285,41 @@ export class ShopService {
     const { userId, shopId } = likeInfo;
     console.log('=== POST  /shop/like');
     console.log(`=== @Body()  ${userId}, ${shopId}`);
+    let likeHistory;
 
-    let likeHistory = await getRepository(Like)
-      .createQueryBuilder('like')
-      .select([
-        'like.id'
-      ])
-      .where({ userId, shopId })
-      .getOne();
-    
-    // 좋아요 기록이 있으면 삭제 처리
-    if (likeHistory) {
-      await getRepository(Like)
+    try {
+      likeHistory = await getRepository(Like)
         .createQueryBuilder('like')
-        .delete()
-        .from(Like)
-        .where({ id: likeHistory.id })
-        .execute();
-      return '삭제되었습니다.'
-    } else {
-      // 좋아요 기록이 없으면 추가 처리
-      let likeInfo = await getRepository(Like)
-        .createQueryBuilder('like')
-        .insert()
-        .into(Like)
-        .values([
-          { userId, shopId }
+        .select([
+          'like.id'
         ])
-        .updateEntity(false)
-        .execute();
-      return likeInfo;
+        .where({ userId, shopId })
+        .getOne();
+      
+      // 좋아요 기록이 있으면 삭제 처리
+      if (likeHistory) {
+        await getRepository(Like)
+          .createQueryBuilder('like')
+          .delete()
+          .from(Like)
+          .where({ id: likeHistory.id })
+          .execute();
+        return '삭제되었습니다.'
+      } else {
+        // 좋아요 기록이 없으면 추가 처리
+        let likeInfo = await getRepository(Like)
+          .createQueryBuilder('like')
+          .insert()
+          .into(Like)
+          .values([
+            { userId, shopId }
+          ])
+          .updateEntity(false)
+          .execute();
+        return likeInfo;
+      }
+    } catch (e) {
+      throw e;
     }
   }
 
@@ -297,40 +329,44 @@ export class ShopService {
     console.log('=== POST  /shop/comment');
     console.log(`=== @Body()  ${userId}, ${shopId}, ${comment}`);
 
-    // 댓글 입력
-    const tmpComment = await getRepository(Comment)
-      .createQueryBuilder('comment')
-      .insert()
-      .into(Comment)
-      .values([
-        { userId, shopId, comment }
-      ])
-      .updateEntity(false)
-      .execute();
-    
-    
-    const entityManager = getManager();
+    let tmpComment;
     let writtenComment;
-    await entityManager.query(
-      `SELECT
-          c.id,
-          c.userId,
-          c.shopId,
-          c.comment,
-          c.created_at,
-          c.updated_at,
-          u.email,
-          u.name,
-          u.nick
-      FROM
-          comment AS c,
-          user AS u
-      WHERE c.id = ${tmpComment.raw.insertId} 
-      AND c.userId = u.id
-      limit 1`
-      ).then(data => {
-        writtenComment = data[0];
-      })
+
+    try {
+      tmpComment = await getRepository(Comment)
+        .createQueryBuilder('comment')
+        .insert()
+        .into(Comment)
+        .values([
+          { userId, shopId, comment }
+        ])
+        .updateEntity(false)
+        .execute();
+      
+      const entityManager = getManager();
+      await entityManager.query(
+        `SELECT
+            c.id,
+            c.userId,
+            c.shopId,
+            c.comment,
+            c.created_at,
+            c.updated_at,
+            u.email,
+            u.name,
+            u.nick
+        FROM
+            comment AS c,
+            user AS u
+        WHERE c.id = ${tmpComment.raw.insertId} 
+        AND c.userId = u.id
+        limit 1`
+        ).then(data => {
+          writtenComment = data[0];
+        })
+    } catch (e) {
+      throw e;
+    }
     
     // 댓글 정보 리턴
     return writtenComment;
@@ -392,87 +428,95 @@ export class ShopService {
 
     const entityManager = getManager();
     let nearList;
-    await entityManager.query(
-      `SELECT 
-          id,
-          name,
-          address,
-          latitude,
-          longitude,
-          category,
-          recommend,
-          phone,
-          (6371*acos(cos(radians(${latitude}))*cos(radians(latitude))*cos(radians(longitude)-radians(${longitude}))+sin(radians(${latitude}))*sin(radians(latitude)))) AS distance 
-      FROM shop
-      ORDER BY distance
-      ASC LIMIT 1;`
+    let recPlaChe;
+
+    try {
+      await entityManager.query(
+        `SELECT 
+            id,
+            name,
+            address,
+            latitude,
+            longitude,
+            category,
+            recommend,
+            phone,
+            (6371*acos(cos(radians(${latitude}))*cos(radians(latitude))*cos(radians(longitude)-radians(${longitude}))+sin(radians(${latitude}))*sin(radians(latitude)))) AS distance 
+        FROM shop
+        ORDER BY distance
+        ASC LIMIT 1;`
       ).then(data => {
         nearList = data;
       })
     
-    let recPlaChe = await Promise.all([
-      // recycle
-      getRepository(Shop)
-      .createQueryBuilder('shop')
-        .select([
-          'shop.id',
-          'shop.name',
-          'shop.address',
-          'shop.latitude',
-          'shop.longitude',
-          'shop.category',
-          'shop.recommend',
-          'shop.phone'
-        ])
-      .where({ recommend: 'recycle' })
-        .getMany(),
-      
-      // antiPlastic
-      getRepository(Shop)
-      .createQueryBuilder('shop')
-        .select([
-          'shop.id',
-          'shop.name',
-          'shop.address',
-          'shop.latitude',
-          'shop.longitude',
-          'shop.category',
-          'shop.recommend',
-          'shop.phone'
-        ])
-      .where({ recommend: 'antiPlastic' })
-        .getMany(),
-      
-      // antiChemical
-      getRepository(Shop)
-      .createQueryBuilder('shop')
-        .select([
-          'shop.id',
-          'shop.name',
-          'shop.address',
-          'shop.latitude',
-          'shop.longitude',
-          'shop.category',
-          'shop.recommend',
-          'shop.phone'
-        ])
-      .where({ recommend: 'antiChemical' })
-      .getMany()
-    ])
+      recPlaChe = await Promise.all([
+        // recycle
+        getRepository(Shop)
+        .createQueryBuilder('shop')
+          .select([
+            'shop.id',
+            'shop.name',
+            'shop.address',
+            'shop.latitude',
+            'shop.longitude',
+            'shop.category',
+            'shop.recommend',
+            'shop.phone'
+          ])
+        .where({ recommend: 'recycle' })
+          .getMany(),
+        
+        // antiPlastic
+        getRepository(Shop)
+        .createQueryBuilder('shop')
+          .select([
+            'shop.id',
+            'shop.name',
+            'shop.address',
+            'shop.latitude',
+            'shop.longitude',
+            'shop.category',
+            'shop.recommend',
+            'shop.phone'
+          ])
+        .where({ recommend: 'antiPlastic' })
+          .getMany(),
+        
+        // antiChemical
+        getRepository(Shop)
+        .createQueryBuilder('shop')
+          .select([
+            'shop.id',
+            'shop.name',
+            'shop.address',
+            'shop.latitude',
+            'shop.longitude',
+            'shop.category',
+            'shop.recommend',
+            'shop.phone'
+          ])
+        .where({ recommend: 'antiChemical' })
+        .getMany()
+      ])
 
-    // destructuring
-    const [recycleList, antiPlasticList, antiChemicalList] = recPlaChe;
+      // destructuring
+      let [recycleList, antiPlasticList, antiChemicalList] = recPlaChe;
+  
+      // 랜덤한 값들 추출
+      let resultRecycle = recycleList[Math.floor(Math.random() * recycleList.length)]
+      let resultAntiPlastic = antiPlasticList[Math.floor(Math.random() * antiPlasticList.length)]
+      let resultAntiChemical = antiChemicalList[Math.floor(Math.random() * antiChemicalList.length)]
+  
+      // // result 객체에 담기
+      result.nearest = nearList[0];
+      result.resultRecycle = resultRecycle;
+      result.resultAntiPlastic = resultAntiPlastic;
+      result.resultAntiChemical = resultAntiChemical;
+      
+    } catch (e) {
+      throw e;
+    }
     
-    // 랜덤한 값들 추출
-    let resultRecycle = recycleList[Math.floor(Math.random() * recycleList.length)]
-    let resultAntiPlastic = antiPlasticList[Math.floor(Math.random() * antiPlasticList.length)]
-    let resultAntiChemical = antiChemicalList[Math.floor(Math.random() * antiChemicalList.length)]
-
-    // // result 객체에 담기
-    result.nearest = nearList[0];
-    result.resultRecycle = resultRecycle;
-    result.resultAntiPlastic = resultAntiPlastic;
-    result.resultAntiChemical = resultAntiChemical;
     
     // await this.visitRepository.find({
     //  where: { userId: Number(userId) }
