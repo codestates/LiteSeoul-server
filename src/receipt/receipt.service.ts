@@ -18,22 +18,8 @@ export class ReceiptService {
     private readonly userService: UserService,
   ) {}
 
-  async list(user) {
-    if (user.snsId === 'local') {
-      const target = await this.userRepository.findOne({
-        where: { email: user.email },
-      });
-      return await this.receiptRepository.find({
-        where: { user: target.id },
-      });
-    } else {
-      const target = await this.userRepository.findOne({
-        where: { snsId: user.snsId },
-      });
-      return await this.receiptRepository.find({
-        where: { user: target.id },
-      });
-    }
+  async list(id) {
+    return await this.receiptRepository.find({ user: id });
   }
 
   async add(body, file) {
@@ -46,7 +32,7 @@ export class ReceiptService {
       where: { imgName: file.originalname, user: user.id },
     });
     if (check) {
-      throw new ConflictException('이미 존재하는 영수증 입니다.');
+      throw new ConflictException('이미 등록된 영수증 입니다.');
     }
     const receiptImgPath = `${process.env.SERVER_URL}uploads/${file.originalname}`;
 
