@@ -1,11 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Shop } from 'src/models/shop.model';
-import { getManager, getRepository, Repository } from 'typeorm';
+import { getManager, getRepository } from 'typeorm';
 import { Like } from 'src/models/like.model';
 import { Comment } from 'src/models/comment.model';
 import { Visit } from 'src/models/visit.model';
-import { User } from 'src/models/user.model';
 
 @Injectable()
 export class ShopService {
@@ -220,6 +218,39 @@ export class ShopService {
       .getMany();
 
     return recycleList;
+  }
+
+  // ======================================================================== 자주 방문한 샵 목록 ::: GET  /shop/manyVisits/:userId
+  async getManyVisits(userInfo) {
+    let { userId } = userInfo;
+    userId = Number(userId);
+    console.log(`=== GET  /shop/manyVisits/${userId}`);
+    
+    let visitList = await getRepository(Visit)
+      .createQueryBuilder('visit')
+      .innerJoinAndSelect("visit.shop", "shop")
+      .select([
+        'visit.id',
+        'visit.userId',
+        'visit.shopId',
+        'visit.visitCnt',
+        'shop.id',
+        'shop.name',
+        'shop.address',
+        'shop.latitude',
+        'shop.longitude',
+        'shop.category',
+        'shop.recommend',
+        'shop.phone'
+      ])
+      .where({ userId: userId })
+      .getMany();
+    
+    visitList.sort((a, b) => {
+      return b['visitCnt'] - a['visitCnt'];
+    })
+
+    return visitList;
   }
 
   // ======================================================================== 샵 좋아요 ::: POST  /shop/like
@@ -464,6 +495,6 @@ export class ShopService {
     // return a;
     // return {visitShopList, likeShopList};
     return result;
-  }
+  } 
 }
 
