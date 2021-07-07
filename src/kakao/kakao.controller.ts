@@ -1,84 +1,22 @@
-import { Controller, Get, Header, Query, Res } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/models/user.model';
-import { Repository } from 'typeorm';
+import { HttpService, Controller, Post, Body, Get, Res } from '@nestjs/common';
 import { KakaoService } from './kakao.service';
 import { JwtService } from '@nestjs/jwt';
 
 @Controller('kakao')
 export class KakaoController {
-  constructor(
-    private readonly kakaoService: KakaoService,
-    @InjectRepository(User) private userRepository: Repository<User>,
-    private jwtService: JwtService,
-  ) {}
-  @Get('login')
-  @Header('Content-Type', 'text/html')
-  kakaologin(@Res() res): void {
-    const _hostName = 'https://kauth.kakao.com';
-    const _restApiKey = process.env.KAKAO_REST_API_KEY;
-    // 카카오 로그인 RedirectURI 등록
-    const _redirectUrl = `${process.env.KAKAO_REDIRECT_URI}/kakao/loginLogic`;
-    const url = `${_hostName}/oauth/authorize?client_id=${_restApiKey}&redirect_uri=${_redirectUrl}&response_type=code`;
-    return res.redirect(url);
+  constructor(private kakaoService: KakaoService) {}
+
+  @Post('login')
+  async kakaoLogin(@Body() body) {
+    console.log(body);
+    const { kakaoToken } = body;
+    this.kakaoService.setToken(kakaoToken);
+    let info = await this.kakaoService.info();
+    this.kakaoService.addNewUser(info.data);
+    const access_token = this.kakaoService.getToken(info.data.id);
+    return access_token;
   }
 
-  @Get('loginLogic')
-  @Header('Content-Type', 'text/html')
-  kakaologinLogic(@Query() qs, @Res() res): void {
-    console.log(qs.code);
-    const _restApiKey = process.env.KAKAO_REST_API_KEY; // * 입력필요
-    const _redirect_uri = `${process.env.KAKAO_REDIRECT_URI}/kakao/loginLogic`;
-    const _hostName = `https://kauth.kakao.com/oauth/token?grant_type=authorization_code&client_id=${_restApiKey}&redirect_uri=${_redirect_uri}&code=${qs.code}`;
-    const _headers = {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
-      },
-    };
-    this.kakaoService
-      .login(_hostName, _headers)
-      .then((e) => {
-        console.log(`TOKEN : ${e.data['access_token']}`);
-        this.kakaoService.setToken(e.data['access_token']);
-        this.kakaoService.info().then(async (e) => {
-          console.log(e.data);
-          const user = await this.userRepository.findOne({
-            where: { snsId: e.data.id },
-          });
-          if (user) {
-            const id = user.id;
-            console.log(id);
-            const access_token = this.jwtService.sign({ id });
-            console.log(this.jwtService.verify(access_token));
-            res.send({ access_token, user });
-          } else {
-            const payload = {
-              snsId: e.data.id,
-              nick: e.data.properties.nickname,
-              profileImgPath: e.data.properties.profile_image,
-              email: e.data.kakao_account.email,
-              maxExp: 500,
-            };
-
-            await this.userRepository.save(payload);
-
-            const newUser = await this.userRepository.findOne({
-              where: { snsId: e.data.id },
-            });
-            const id = newUser.id;
-            console.log(id);
-            const access_token = this.jwtService.sign({ id });
-            console.log(this.jwtService.verify(access_token));
-            res.send({ access_token, payload });
-          }
-        });
-      })
-      .catch((err) => {
-        console.log(err);
-        return res.send('error');
-      });
-  }
-  // 카카오 로그인 -> 고급에서 로그아웃 Logout Redirect URI 설정 필요
   @Get('logout')
   kakaologout(@Res() res): void {
     console.log(`LOGOUT TOKEN : ${this.kakaoService.accessToken}`);
