@@ -60,12 +60,6 @@ export class UserController {
   }
 
   // 회원정보 수정
-  @Post('update')
-  update(@Body() body) {
-    return this.userService.update(body);
-  }
-
-  // 프로필 사진 병경
   @UseInterceptors(
     FileInterceptor('UserImg', {
       storage: diskStorage({
@@ -79,9 +73,9 @@ export class UserController {
       limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
     }),
   )
-  @Post('profile')
-  changeProfile(@Body() body, @UploadedFile() file: Express.Multer.File) {
-    return this.userService.changeProfile(body.access_token, file);
+  @Post('update')
+  update(@Body() body, @UploadedFile() file: Express.Multer.File) {
+    return this.userService.update(body, file);
   }
 
   // 회원탈퇴
