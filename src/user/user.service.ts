@@ -114,6 +114,23 @@ export class UserService {
     user.profileImgPath = profileImgPath;
     user.nick = body.nick;
     user.phone = body.phone;
+    user.profileText = body.profileText;
+    await this.userRepository.save(user);
+    return user;
+  }
+
+  // 회원정보 변경 (이미지 없이)
+  async changeinfo(body) {
+    const target = await this.jwtService.verify(body.access_token);
+    const { id } = target;
+    const user = await this.userRepository.findOne({ id });
+    const hashedPaword = await bcrypt.hash(body.password, user.salt);
+    if (!(user.password === hashedPaword)) {
+      throw new ForbiddenException('비밀번호가 일치하지 않습니다.');
+    }
+    user.nick = body.nick;
+    user.phone = body.phone;
+    user.profileText = body.profileText;
     await this.userRepository.save(user);
     return user;
   }
