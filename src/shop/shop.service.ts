@@ -283,10 +283,6 @@ export class ShopService {
         .where({ userId, shopId })
         .getOne();
       
-      if (!likeHistory) {
-        throw new BadRequestException('잘못된 요청입니다.')
-      }
-      
       // 좋아요 기록이 있으면 삭제 처리
       if (likeHistory) {
         await getRepository(Like)
