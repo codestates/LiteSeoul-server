@@ -78,6 +78,12 @@ export class UserController {
     return this.userService.update(body, file);
   }
 
+  // 회원정보 변경 (이미지 없이)
+  @Post('changeinfo')
+  changeinfo(@Body() body) {
+    return this.userService.changeinfo(body);
+  }
+
   // 회원탈퇴
   @Post('delete')
   delete(@Body() body) {
