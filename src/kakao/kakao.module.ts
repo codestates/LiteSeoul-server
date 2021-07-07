@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { HttpModule, HttpService, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/models/user.model';
@@ -12,6 +12,7 @@ import { KakaoService } from './kakao.service';
       secret: process.env.JWT_CONSTANTS,
       signOptions: { expiresIn: '1d' },
     }),
+    HttpModule,
   ],
   controllers: [KakaoController],
   providers: [KakaoService],
