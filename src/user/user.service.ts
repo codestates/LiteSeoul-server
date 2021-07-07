@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -101,40 +102,18 @@ export class UserService {
   }
 
   // 회원정보 수정
-  async update(body) {
-    const user = await this.getOne(body.access_token);
-    if (body.email) {
-      user.email = body.email;
+  async update(body, file) {
+    const target = await this.jwtService.verify(body.access_token);
+    const { id } = target;
+    const user = await this.userRepository.findOne({ id });
+    const hashedPaword = await bcrypt.hash(body.password, user.salt);
+    if (!(user.password === hashedPaword)) {
+      throw new ForbiddenException('비밀번호가 일치하지 않습니다.');
     }
-    if (body.password) {
-      const salt = await bcrypt.genSalt(); // 솔트
-      const hashedPaword = await bcrypt.hash(body.password, salt);
-      user['salt'] = salt;
-      user['password'] = hashedPaword;
-    }
-    if (body.name) {
-      user.name = body.name;
-    }
-    if (body.nick) {
-      user.nick = body.nick;
-    }
-    if (body.phone) {
-      user.phone = body.phone;
-    }
-    if (body.profileText) {
-      user.profileText = body.profileText;
-    }
-    await this.userRepository.save(user);
-    return user;
-  }
-
-  // 프로필 사진 변경
-  async changeProfile(token, file) {
-    const user = await this.getOne(token);
-    if (file) {
-      const profileImgPath = `${process.env.SERVER_URL}uploads/${file.originalname}`;
-      user.profileImgPath = profileImgPath;
-    }
+    const profileImgPath = `${process.env.SERVER_URL}uploads/${file.originalname}`;
+    user.profileImgPath = profileImgPath;
+    user.nick = body.nick;
+    user.phone = body.phone;
     await this.userRepository.save(user);
     return user;
   }
