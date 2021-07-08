@@ -25,7 +25,7 @@ import { ReceiptModule } from './receipt/receipt.module';
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
       entities: [User, Like, Visit, Receipt, Shop, Comment],
-      synchronize: true,
+      synchronize: false,
     }),
     UserModule,
     KakaoModule,

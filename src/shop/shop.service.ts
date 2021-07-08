@@ -138,7 +138,8 @@ export class ShopService {
               comment AS c,
               user AS u
           WHERE c.shopId = ${Number(id)} 
-          AND c.userId = u.id`
+          AND c.userId = u.id
+          ORDER BY c.id DESC`
         ).then(data => {
           return data;
         })
