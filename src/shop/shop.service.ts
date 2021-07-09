@@ -587,9 +587,9 @@ export class ShopService {
 
   // ======================================================================== 샵 등록 ::: POST  /shop/register
   async registerShop(shopInfo, file) {
-    console.log('=== POST  /shop/register');
-    
     const { storeName, address, marketNum, storeEmail, category, recommend, text } = shopInfo;
+    console.log('=== POST  /shop/register');
+    console.log(`=== @Body()  ${storeName}, ${address}, ${marketNum}, ${storeEmail}, ${category}, ${recommend}, ${text}`);
 
     let insertedShop;
     const shopImgPath = `${process.env.SERVER_URL}uploads/${file.originalname}`;
