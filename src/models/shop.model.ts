@@ -64,3 +64,4 @@ export class Shop extends BaseEntity {
   @OneToMany((type) => Visit, (visit) => visit.shop)
   visit: Visit[];
 }
+

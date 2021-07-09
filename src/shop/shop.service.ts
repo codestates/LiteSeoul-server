@@ -16,55 +16,71 @@ export class ShopService {
     
     // 샵 목록
     let shopList;
-    // 사용자 방문 횟수에 따른 랭킹으로 sorting
+    // 좋아요 횟수에 따른 랭킹으로 sorting
     let rankedList;
 
     try {
+
       shopList = await getRepository(Shop)
         .createQueryBuilder("shop")
-        .leftJoinAndSelect("shop.visit", "visit")
         .leftJoinAndSelect("shop.like", "like")
         .select([
           'shop.id',
+          'shop.imgPath',
           'shop.name',
           'shop.address',
+          'shop.text',
           'shop.latitude',
           'shop.longitude',
+          'shop.email',
+          'shop.phone',
+          'shop.regisNumber',
           'shop.category',
           'shop.recommend',
-          'shop.phone',
-          'visit.id',
-          'visit.userId',
-          'visit.shopId',
-          'visit.visitCnt',
+          'shop.isAdmitted',
           'like.id',
           'like.userId',
-          'like.shopId'
+          'like.shopId',
         ])
-        .orderBy('visit.visitCnt', 'DESC')
-        .take(6)
+        .where({
+          isAdmitted: 1
+        })
+        .take(5)
         .getMany();
-    
-      let cntManyCustomer;
-      let cntPerCustomer;
-
+      
+      // 각 샵에 좋아요 count 값 입력
       rankedList = shopList.map(el => {
-        // 샵에 방문한 사용자 수
-        cntManyCustomer = el.visit.length;
-        // 샵에 방문한 모든 사용자가 방문한 횟수
-        cntPerCustomer = el.visit.reduce((acc, cur) => {
-          return acc + cur.visitCnt;
-        }, 0);
-        
-        // 샵에 totalPoint 추가
-        el["totalPoint"] = cntManyCustomer + cntPerCustomer;
-        return el;
+        return {
+          ...el,
+          likeLength: el.like.length
+        }
       })
 
-      // 결과 재배열
+      // 좋아요 count에 따라 sorting
       rankedList.sort((a, b) => {
-        return b['totalPoint'] - a['totalPoint'];
+        return b['likeLength'] - a['likeLength']
       })
+      
+      // let cntManyCustomer;
+      // let cntPerCustomer;
+
+      // rankedList = shopList.map(el => {
+      //   // 샵에 방문한 사용자 수
+      //   cntManyCustomer = el.visit.length;
+      //   // 샵에 방문한 모든 사용자가 방문한 횟수
+      //   cntPerCustomer = el.visit.reduce((acc, cur) => {
+      //     return acc + cur.visitCnt;
+      //   }, 0);
+        
+      //   // 샵에 totalPoint 추가
+      //   el["totalPoint"] = cntManyCustomer + cntPerCustomer;
+      //   return el;
+      // })
+
+      // // 결과 재배열
+      // rankedList.sort((a, b) => {
+      //   return b['totalPoint'] - a['totalPoint'];
+      // })
 
     } catch (e) {
       throw e;
@@ -88,13 +104,18 @@ export class ShopService {
         .createQueryBuilder('shop')
         .select([
           'shop.id',
+          'shop.imgPath',
           'shop.name',
           'shop.address',
+          'shop.text',
           'shop.latitude',
           'shop.longitude',
+          'shop.email',
+          'shop.phone',
+          'shop.regisNumber',
           'shop.category',
           'shop.recommend',
-          'shop.phone'
+          'shop.isAdmitted'
         ])
         .where({ id: Number(id) })
         .getOne();
@@ -168,14 +189,22 @@ export class ShopService {
         .createQueryBuilder('shop')
         .select([
           'shop.id',
+          'shop.imgPath',
           'shop.name',
           'shop.address',
+          'shop.text',
           'shop.latitude',
           'shop.longitude',
+          'shop.email',
+          'shop.phone',
+          'shop.regisNumber',
           'shop.category',
           'shop.recommend',
-          'shop.phone'
+          'shop.isAdmitted'
         ])
+        .where({
+          isAdmitted: 1
+        })
         .getMany();
     } catch (e) {
       throw e;
@@ -197,15 +226,23 @@ export class ShopService {
         .createQueryBuilder('shop')
         .select([
           'shop.id',
+          'shop.imgPath',
           'shop.name',
           'shop.address',
+          'shop.text',
           'shop.latitude',
           'shop.longitude',
+          'shop.email',
+          'shop.phone',
+          'shop.regisNumber',
           'shop.category',
           'shop.recommend',
-          'shop.phone'
+          'shop.isAdmitted'
         ])
-        .where({ category: categoryName })
+        .where({
+          category: categoryName,
+          isAdmitted: 1
+        })
         .getMany();
       
       if (shopList.length === 0) {
@@ -239,15 +276,23 @@ export class ShopService {
         'visit.shopId',
         'visit.visitCnt',
         'shop.id',
+        'shop.imgPath',
         'shop.name',
         'shop.address',
+        'shop.text',
         'shop.latitude',
         'shop.longitude',
+        'shop.email',
+        'shop.phone',
+        'shop.regisNumber',
         'shop.category',
         'shop.recommend',
-        'shop.phone'
+        'shop.isAdmitted',
       ])
-      .where({ userId: userId })
+      .where({
+        userId: userId,
+        isAdmitted: 1
+      })
       .getMany();
     
     // 방문 수로 sorting
@@ -365,7 +410,7 @@ export class ShopService {
   // ======================================================================== 샵 추천 ::: POST  /shop/recommend  :::  랜덤 추천 || 사용자 취향에 따른 추천
   async getShopsByRecommend(userInfo) {
     const { latitude, longitude, userId } = userInfo;
-    console.log('=== POST  /shop/recommend ');
+    console.log('=== POST  /shop/recommend');
     console.log(`=== @Body()  ${latitude}, ${longitude}, ${userId}`);
 
     let result: any = {}; // 결과값
@@ -426,15 +471,21 @@ export class ShopService {
         entityManager.query(
           `SELECT 
               id,
+              imgPath,
               name,
               address,
+              text,
               latitude,
               longitude,
+              email,
+              phone,
+              regisNumber,
               category,
               recommend,
-              phone,
+              isAdmitted,
               (6371*acos(cos(radians(${latitude}))*cos(radians(latitude))*cos(radians(longitude)-radians(${longitude}))+sin(radians(${latitude}))*sin(radians(latitude)))) AS distance 
           FROM shop
+          WHERE isAdmitted = 1
           ORDER BY distance
           ASC LIMIT 1;`
         ).then(data => (data[0])),
@@ -444,15 +495,23 @@ export class ShopService {
         .createQueryBuilder('shop')
         .select([
             'shop.id',
+            'shop.imgPath',
             'shop.name',
             'shop.address',
+            'shop.text',
             'shop.latitude',
             'shop.longitude',
+            'shop.email',
+            'shop.phone',
+            'shop.regisNumber',
             'shop.category',
             'shop.recommend',
-            'shop.phone'
+            'shop.isAdmitted'
         ])
-        .where({ recommend: 'recycle' })
+          .where({
+            recommend: 'recycle',
+            isAdmitted: 1
+          })
         .getMany(),
         
         // antiPlastic
@@ -460,15 +519,23 @@ export class ShopService {
         .createQueryBuilder('shop')
         .select([
             'shop.id',
+            'shop.imgPath',
             'shop.name',
             'shop.address',
+            'shop.text',
             'shop.latitude',
             'shop.longitude',
+            'shop.email',
+            'shop.phone',
+            'shop.regisNumber',
             'shop.category',
             'shop.recommend',
-            'shop.phone'
+            'shop.isAdmitted',
         ])
-        .where({ recommend: 'antiPlastic' })
+          .where({
+            recommend: 'antiPlastic',
+            isAdmitted: 1
+          })
         .getMany(),
         
         // antiChemical
@@ -476,15 +543,23 @@ export class ShopService {
         .createQueryBuilder('shop')
         .select([
             'shop.id',
+            'shop.imgPath',
             'shop.name',
             'shop.address',
+            'shop.text',
             'shop.latitude',
             'shop.longitude',
+            'shop.email',
+            'shop.phone',
+            'shop.regisNumber',
             'shop.category',
             'shop.recommend',
-            'shop.phone'
+            'shop.isAdmitted'
         ])
-        .where({ recommend: 'antiChemical' })
+          .where({
+            recommend: 'antiChemical',
+            isAdmitted: 1
+          })
         .getMany()
       ])
 
@@ -507,5 +582,41 @@ export class ShopService {
     }
     
     return result;
-  } 
+  }
+
+
+  // ======================================================================== 샵 등록 ::: POST  /shop/register
+  async registerShop(shopInfo, file) {
+    console.log('=== POST  /shop/register');
+    
+    const { storeName, address, marketNum, storeEmail, category, text, infoOk} = shopInfo;
+
+    let insertedShop;
+    const shopImgPath = `${process.env.SERVER_URL}uploads/${file.originalname}`;
+
+    try {
+      insertedShop = await getRepository(Shop)
+      .createQueryBuilder('shop')
+      .insert()
+      .into(Shop)
+      .values([
+        {
+          imgPath: shopImgPath,
+          name: storeName,
+          address: address,
+          text: text,
+          email: storeEmail,
+          regisNumber: marketNum,
+          category: category,
+        }
+      ])
+      .updateEntity(false)
+      .execute();
+    } catch (e) {
+      throw e;
+    }
+
+    return insertedShop;
+  }
 }
+
