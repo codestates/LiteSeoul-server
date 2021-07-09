@@ -589,7 +589,7 @@ export class ShopService {
   async registerShop(shopInfo, file) {
     console.log('=== POST  /shop/register');
     
-    const { storeName, address, marketNum, storeEmail, category, text, infoOk} = shopInfo;
+    const { storeName, address, marketNum, storeEmail, category, recommend, text } = shopInfo;
 
     let insertedShop;
     const shopImgPath = `${process.env.SERVER_URL}uploads/${file.originalname}`;
@@ -608,6 +608,7 @@ export class ShopService {
           email: storeEmail,
           regisNumber: marketNum,
           category: category,
+          recommend: recommend
         }
       ])
       .updateEntity(false)
