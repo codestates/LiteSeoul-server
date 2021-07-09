@@ -9,10 +9,16 @@ export class Shop extends BaseEntity {
   id: number;
 
   @Column()
+  imgPath: string;
+
+  @Column()
   name: string;
 
   @Column()
   address: string;
+
+  @Column()
+  text: string;
 
   @Column()
   latitude: string;
@@ -27,8 +33,17 @@ export class Shop extends BaseEntity {
   recommend: string;
 
   @Column()
+  email: string;
+
+  @Column()
   phone: string;
 
+  @Column() 
+  regisNumber: string;
+
+  @Column({default: 0})
+  isAdmitted: number;
+  
   @CreateDateColumn()
   created_at: Date;
 
@@ -43,3 +58,4 @@ export class Shop extends BaseEntity {
   visit: Visit[];
 
 }
+
