@@ -45,7 +45,7 @@ export class UserService {
       return 0;
     });
 
-    return users.slice(0, 5);
+    return users.slice(0, 9);
   }
 
   // 로그인
@@ -97,6 +97,7 @@ export class UserService {
         maxExp: 500,
       };
       await this.userRepository.save(result);
+      this.sendMail(email, name);
       return result;
     }
   }
@@ -140,5 +141,50 @@ export class UserService {
     const user = await this.getOne(token);
     await this.userRepository.delete({ id: user.id });
     return { message: '정상적으로 탈퇴되었습니다.' };
+  }
+
+  // 가입 감사 이메일 보내기
+  async sendMail(email, name) {
+    try {
+      const nodemailer = require('nodemailer');
+
+      let transporter = nodemailer.createTransport({
+        service: 'gmail',
+        host: 'smtp.naver.com',
+        port: 587,
+        secure: false, // true for 465, false for other ports
+        auth: {
+          user: 'wjdxo5307@gmail.com', // generated ethereal user
+          pass: 'wjdxo123', // generated ethereal password
+        },
+      });
+
+      let info = await transporter.sendMail({
+        from: 'wjdxo5307@gmail.com', // sender address
+        to: `${email}`, // list of receivers
+        subject: `${name}님 환경 지키기에 동참해주셔서 감사합니다.`, // Subject line
+        text: '[변수명 : 고객 이름이나 닉네임] 님 환경 지키기에 동참해주셔서 감사합니다.', // plain text body
+        html: `<b> <h1>Lite Seoul</h1> 
+        <br> <h2>"당신의 서울, 서울을 깨끗하게"</h2>
+        <br> 지금, 아픈 지구를 살리기 위해 당신의 손길이 필요합니다.
+        <br>우리가 서 있고 천만시민이 살아가는 서울을 먼저 살리기 위해 만들었습니다.
+        <br> 
+        <br> 
+        <br> <h2>"서울의 '제로 웨이스트 샵(Zero Waste Shop)'을 찾아드릴게요"</h2>
+        <br>탄소중립시대인 '넷제로(Net-Zero)'를 위해 함께 동참해주세요.
+        <br>당신 근처에서 환경을 위해 재생용기를 사용하고
+        <br>1회용품과 화학용품을 없앤 '제로 웨이스트 샵(Zero Waste Shop)'을 만나보세요.
+        <br> 
+        <br> 
+        <br> <h2>"우리가 기억합니다, 당신의 제로 웨이스트(Zero Waste)"</h2>
+        <br>제로 웨이스트 샵에서 구매한 영수증 혹은 인증샷을 올려주세요!
+        <br>점수를 산정하여 매 달 상위권에 계신 분들의 명의로 서울시내 결식아동 구호관련 기부를 진행합니다 ;)`, // html body
+      });
+
+      console.log('Message sent: %s', info.messageId);
+      console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+    } catch (err) {
+      console.error(err);
+    }
   }
 }
