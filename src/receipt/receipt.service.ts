@@ -1,10 +1,12 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { readFile } from 'fs';
 import { Receipt } from 'src/models/receipt.model';
 import { User } from 'src/models/user.model';
 import { UserService } from 'src/user/user.service';
@@ -35,13 +37,47 @@ export class ReceiptService {
       throw new ConflictException('이미 등록된 영수증 입니다.');
     }
     const receiptImgPath = `${process.env.SERVER_URL}uploads/${file.originalname}`;
+    let number: string = '';
+
+    try {
+      var Tesseract = require('tesseract.js');
+      const result = await Tesseract.recognize(
+        `${process.env.SERVER_URL}uploads/${file.originalname}`,
+        'kor',
+      );
+      const line = result.data.text.split(`\n`);
+      console.log('======', line);
+      const sentence = line.find(
+        (data) =>
+          (data.includes('사') ||
+            data.includes('샤') ||
+            data.includes('삿') ||
+            data.includes('시')) &&
+          (data.includes('업') || data.includes('엄')),
+      );
+
+      for (let i = 0; i < sentence.length; i++) {
+        if (sentence[i] === ' ') {
+          continue;
+        } else if ('1234567890'.includes(sentence[i])) {
+          number = number + sentence[i];
+        }
+        if (number.length === 10) {
+          break;
+        }
+      }
+      // return number;
+    } catch (error) {
+      throw new BadRequestException('영수증을 다시 찍어주세요.');
+    }
 
     const receipt = {
       user: user.id,
       imgPath: receiptImgPath,
       imgName: file.originalname,
+      shopNumber: Number(number),
     };
-    console.log(receipt);
+    // console.log('--------', receipt);
     await this.receiptRepository.save(receipt);
     let { level, currentExp, maxExp } = user;
     currentExp = currentExp + 50;
@@ -51,7 +87,7 @@ export class ReceiptService {
       currentExp = 0;
     }
     const update = { level, maxExp, currentExp };
-    console.log({ ...user, ...update });
+    // console.log({ ...user, ...update });
     await this.userRepository.save({ ...user, ...update });
 
     return { receipt, user: { ...user, ...update } };

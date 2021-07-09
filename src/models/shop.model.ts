@@ -1,7 +1,14 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, BaseEntity, OneToMany, } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  BaseEntity,
+  OneToMany,
+} from 'typeorm';
 import { Like } from './like.model';
 import { Visit } from './visit.model';
-
 
 @Entity()
 export class Shop extends BaseEntity {
@@ -38,12 +45,12 @@ export class Shop extends BaseEntity {
   @Column()
   phone: string;
 
-  @Column() 
+  @Column()
   regisNumber: string;
 
-  @Column({default: 0})
+  @Column({ default: 0 })
   isAdmitted: number;
-  
+
   @CreateDateColumn()
   created_at: Date;
 
@@ -54,8 +61,7 @@ export class Shop extends BaseEntity {
   @OneToMany(() => Like, (like) => like.shop)
   like: Like[];
 
-  @OneToMany((type) => Visit, visit => visit.shop)
+  @OneToMany((type) => Visit, (visit) => visit.shop)
   visit: Visit[];
-
 }
 

@@ -22,6 +22,9 @@ export class Receipt extends BaseEntity {
   user: number;
 
   @Column()
+  shopNumber: number;
+
+  @Column()
   imgPath: string;
 
   @Column()
