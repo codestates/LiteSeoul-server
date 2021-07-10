@@ -9,10 +9,12 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
 		
 		// http://ec2-52-79-247-245.ap-northeast-2.compute.amazonaws.com
 		const url = 'https://api.liteseoul.com';
+		// const url = 'http://localhost:3000';
 		super({
 			clientID: process.env.GOOGLE_CLIENT_ID,
 			clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-			callbackURL: `${url}/google/auth/google/callback`,
+			callbackURL: `${url}`,
+			// callbackURL: `${url}/google/auth/google/callback`,
 			// callbackURL: 'https://api.liteseoul.com/google/auth/google/callback',
 			// callbackURL: 'http://ec2-52-79-247-245.ap-northeast-2.compute.amazonaws.com/google/auth/google/callback',
 			scope: ['email', 'profile']
