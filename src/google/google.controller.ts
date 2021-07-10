@@ -14,14 +14,13 @@ export class GoogleController {
 	
 	@Get('auth/google/callback')
 	@UseGuards(AuthGuard('google'))
-	googleAuthRedirect(@Req() req, @Res() res) {
+	googleAuthRedirect(@Req() req) {
 		console.log('=== controller ::: google login on going');
 
 		// this.googleService.googleLogin(req);
 		this.googleService.setToken(req.user.accessToken); // 구글에서 받아온 토큰을 셋?
 		this.googleService.addNewUser(req.user); // 리턴값 필요?
 		const access_token = this.googleService.getToken(req.user.email); // 토큰 새로 만들어서 리턴?
-		// this.googleAuthRedirect(req, res)
 		return access_token;
 	}
 
