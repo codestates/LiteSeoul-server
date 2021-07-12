@@ -151,8 +151,8 @@ export class UserService {
       let transporter = nodemailer.createTransport({
         service: 'Naver',
         host: 'smtp.naver.com',
-        port: 465,
-        secure: true, // true for 465, false for other ports
+        port: 587,
+        secure: false, // true for 465, false for other ports
         auth: {
           user: process.env.MAIL_EMAIL, // generated ethereal user
           pass: process.env.MAIL_PASSWORD, // generated ethereal password
