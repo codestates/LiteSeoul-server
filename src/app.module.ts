@@ -12,6 +12,7 @@ import { UserModule } from './user/user.module';
 import { KakaoModule } from './kakao/kakao.module';
 import { ShopModule } from './shop/shop.module';
 import { ConfigModule } from '@nestjs/config';
+import { ReceiptModule } from './receipt/receipt.module';
 
 @Module({
   imports: [
@@ -24,12 +25,12 @@ import { ConfigModule } from '@nestjs/config';
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
       entities: [User, Like, Visit, Receipt, Shop, Comment],
-      synchronize: true,
+      synchronize: false,
     }),
-    TypeOrmModule.forFeature([User, Shop, Like, Comment, Visit, Receipt]),
     UserModule,
     KakaoModule,
     ShopModule,
+    ReceiptModule,
   ],
   controllers: [AppController],
   providers: [AppService],

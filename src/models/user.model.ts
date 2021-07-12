@@ -1,4 +1,12 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, BaseEntity, OneToMany, } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  BaseEntity,
+  OneToMany,
+} from 'typeorm';
 import { Like } from './like.model';
 import { Receipt } from './receipt.model';
 import { Visit } from './visit.model';
@@ -19,6 +27,9 @@ export class User extends BaseEntity {
 
   @Column()
   nick?: string;
+
+  @Column()
+  phone?: string;
 
   @Column()
   salt?: string;
@@ -51,10 +62,9 @@ export class User extends BaseEntity {
   @OneToMany(() => Like, (like) => like.user)
   like: Like[];
 
-  @OneToMany(() => Visit, visit => visit.user)
+  @OneToMany(() => Visit, (visit) => visit.user)
   visit: Visit[];
 
-  @OneToMany(() => Receipt, receipt => receipt.user)
+  @OneToMany(() => Receipt, (receipt) => receipt.user)
   receipt: Receipt[];
-
 }
