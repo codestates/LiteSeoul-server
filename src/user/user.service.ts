@@ -156,6 +156,7 @@ export class UserService {
           user: process.env.MAIL_EMAIL, // generated ethereal user
           pass: process.env.MAIL_PASSWORD, // generated ethereal password
         },
+        tls: { rejectUnauthorized: false },
       });
 
       let info = await transporter.sendMail({
