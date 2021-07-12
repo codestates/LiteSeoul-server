@@ -45,7 +45,7 @@ export class ShopService {
         .where({
           isAdmitted: 1
         })
-        .take(5)
+        .take(9)
         .getMany();
       
       // 각 샵에 좋아요 count 값 입력
