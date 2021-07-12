@@ -592,7 +592,7 @@ export class ShopService {
     console.log(`=== @Body()  ${storeName}, ${address}, ${marketNum}, ${storeEmail}, ${category}, ${recommend}, ${text}`);
 
     let insertedShop;
-    const shopImgPath = `${process.env.SERVER_URL}uploads/${file.originalname}`;
+    const shopImgPath = `${process.env.SERVER_URL}uploads/shops/${file.originalname}`;
 
     try {
       insertedShop = await getRepository(Shop)
