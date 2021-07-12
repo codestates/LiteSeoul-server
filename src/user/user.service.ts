@@ -151,8 +151,7 @@ export class UserService {
       let transporter = nodemailer.createTransport({
         service: 'gmail',
         host: 'smtp.naver.com',
-        port: 587,
-        secure: false, // true for 465, false for other ports
+        secure: true, // true for 465, false for other ports
         auth: {
           user: 'wjdxo5307@gmail.com', // generated ethereal user
           pass: 'wjdxo123', // generated ethereal password
