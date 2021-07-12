@@ -5,39 +5,38 @@ import { AuthGuard } from '@nestjs/passport';
 
 @Controller('google')
 export class GoogleController {
-	constructor(private readonly googleService: GoogleService){}
+  constructor(private readonly googleService: GoogleService) {}
 
-	// 구글 로그인 버튼 클릭!
-	@Get('login')
-	@UseGuards(AuthGuard('google'))
-	async googleAuth(@Req() req) {} // 없으면 안 됨...
-	
-	@Get('auth/google/callback')
-	@UseGuards(AuthGuard('google'))
-	async googleAuthRedirect(@Req() req, @Res() res) {
-		console.log('=== controller ::: google login on going');
+  // 구글 로그인 버튼 클릭!
+  @Get('login')
+  @UseGuards(AuthGuard('google'))
+  async googleAuth(@Req() req) {} // 없으면 안 됨...
 
-		// this.googleService.googleLogin(req);
-		await this.googleService.setToken(req.user.accessToken); // 구글에서 받아온 토큰을 셋?
-		await this.googleService.addNewUser(req.user); // 리턴값 필요?
-		await this.googleService.getToken(req.user.email)
-			.then(token => {
-				console.log('=== accesstoken ::: ', token)
-				res.redirect(`https://liteseoul.com?query=${String(token)}`) // ======================================================================== URL POINT
-				// res.redirect(`http://localhost:3000?query=${String(token)}`)
-			})
-		// access_token.then(token => {
-		// 	// res.redirect(`http://localhost:3000?query=${String(token)}`)
-		// 	res.redirect(`http://liteseoul.com?query=${String(token)}`)
-		// })
-	}
+  @Get('auth/google/callback')
+  @UseGuards(AuthGuard('google'))
+  async googleAuthRedirect(@Req() req, @Res() res) {
+    console.log('=== controller ::: google login on going');
 
-	// 구글 로그아웃
-	@Get('logout')
-	googleLogout(@Req() req, @Res() res) {
-		console.log(`=== LOGOUT TOKEN : ${this.googleService.accessToken}`);
-		
-		this.googleService
+    // this.googleService.googleLogin(req);
+    await this.googleService.setToken(req.user.accessToken); // 구글에서 받아온 토큰을 셋?
+    await this.googleService.addNewUser(req.user); // 리턴값 필요?
+    await this.googleService.getToken(req.user.email).then((token) => {
+      console.log('=== accesstoken ::: ', token);
+      // res.redirect(`https://liteseoul.com?query=${String(token)}`) // ======================================================================== URL POINT
+      res.redirect(`http://localhost:3000?query=${String(token)}`);
+    });
+    // access_token.then(token => {
+    // 	// res.redirect(`http://localhost:3000?query=${String(token)}`)
+    // 	res.redirect(`http://liteseoul.com?query=${String(token)}`)
+    // })
+  }
+
+  // 구글 로그아웃
+  @Get('logout')
+  googleLogout(@Req() req, @Res() res) {
+    console.log(`=== LOGOUT TOKEN : ${this.googleService.accessToken}`);
+
+    this.googleService
       .googleLogout()
       .then((e) => {
         return res.send(`
@@ -51,6 +50,6 @@ export class GoogleController {
         console.log(e);
         return res.send('DELETE ERROR');
       });
-		return;
-	}
+    return;
+  }
 }
