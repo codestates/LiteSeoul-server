@@ -74,7 +74,7 @@ export class GoogleService {
 	
 	// 토큰 만들기
 	async getToken(email) {
-		console.log('=== making new access_token in service');
+		console.log('=== making new access_token in service :::', email);
 		
 		const user = await getRepository(User)
 			.createQueryBuilder('user')
