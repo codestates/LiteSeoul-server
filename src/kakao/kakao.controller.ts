@@ -10,10 +10,10 @@ export class KakaoController {
   async kakaoLogin(@Body() body) {
     console.log(body);
     const { kakaoToken } = body;
-    this.kakaoService.setToken(kakaoToken);
+    await this.kakaoService.setToken(kakaoToken);
     let info = await this.kakaoService.info();
-    this.kakaoService.addNewUser(info.data);
-    const access_token = this.kakaoService.getToken(info.data.id);
+    await this.kakaoService.addNewUser(info.data);
+    const access_token = await this.kakaoService.getToken(info.data.id);
     return access_token;
   }
 

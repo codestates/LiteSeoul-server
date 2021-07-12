@@ -149,17 +149,17 @@ export class UserService {
       const nodemailer = require('nodemailer');
 
       let transporter = nodemailer.createTransport({
-        service: 'gmail',
-        host: 'smtp.gmail.com',
+        service: 'Naver',
+        host: 'smtp.naver.com',
         secure: true, // true for 465, false for other ports
         auth: {
-          user: 'wjdxo5307@gmail.com', // generated ethereal user
-          pass: 'wjdxo123', // generated ethereal password
+          user: process.env.MAIL_EMAIL, // generated ethereal user
+          pass: process.env.MAIL_PASSWORD, // generated ethereal password
         },
       });
 
       let info = await transporter.sendMail({
-        from: 'wjdxo5307@gmail.com', // sender address
+        from: process.env.MAIL_EMAIL, // sender address
         to: `${email}`, // list of receivers
         subject: `${name}님 환경 지키기에 동참해주셔서 감사합니다.`, // Subject line
         text: '[변수명 : 고객 이름이나 닉네임] 님 환경 지키기에 동참해주셔서 감사합니다.', // plain text body
