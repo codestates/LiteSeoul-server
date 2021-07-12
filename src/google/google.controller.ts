@@ -14,18 +14,22 @@ export class GoogleController {
 	
 	@Get('auth/google/callback')
 	@UseGuards(AuthGuard('google'))
-	googleAuthRedirect(@Req() req, @Res() res) {
+	async googleAuthRedirect(@Req() req, @Res() res) {
 		console.log('=== controller ::: google login on going');
 
 		// this.googleService.googleLogin(req);
-		this.googleService.setToken(req.user.accessToken); // 구글에서 받아온 토큰을 셋?
-		this.googleService.addNewUser(req.user); // 리턴값 필요?
-		const access_token = this.googleService.getToken(req.user.email); // 토큰 새로 만들어서 리턴?
-		console.log('=== accesstoken ::: ', access_token)
-		access_token.then(token => {
-			// res.redirect(`http://localhost:3000?query=${String(token)}`)
-			res.redirect(`http://liteseoul.com?query=${String(token)}`)
-		})
+		await this.googleService.setToken(req.user.accessToken); // 구글에서 받아온 토큰을 셋?
+		await this.googleService.addNewUser(req.user); // 리턴값 필요?
+		await this.googleService.getToken(req.user.email)
+			.then(token => {
+				console.log('=== accesstoken ::: ', token)
+				res.redirect(`https://liteseoul.com?query=${String(token)}`) // ======================================================================== URL POINT
+				// res.redirect(`http://localhost:3000?query=${String(token)}`)
+			})
+		// access_token.then(token => {
+		// 	// res.redirect(`http://localhost:3000?query=${String(token)}`)
+		// 	res.redirect(`http://liteseoul.com?query=${String(token)}`)
+		// })
 	}
 
 	// 구글 로그아웃
