@@ -43,7 +43,7 @@ export class User extends BaseEntity {
   @Column()
   profileText?: string;
 
-  @Column()
+  @Column({default: 1})
   level?: number;
 
   @Column()
@@ -60,17 +60,17 @@ export class User extends BaseEntity {
 
   // ======================================== 관계 설정
   @OneToMany(() => Like, (like) => like.user, {
-    onDelete: 'CASCADE',
+    cascade: false,
   })
   like: Like[];
 
   @OneToMany(() => Visit, (visit) => visit.user, {
-    onDelete: 'CASCADE',
+    cascade: false,
   })
   visit: Visit[];
 
   @OneToMany(() => Receipt, (receipt) => receipt.user, {
-    onDelete: 'CASCADE',
+    cascade: false,
   })
   receipt: Receipt[];
 }
