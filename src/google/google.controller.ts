@@ -23,7 +23,7 @@ export class GoogleController {
     await this.googleService.getToken(req.user.email).then((token) => {
       console.log('=== accesstoken ::: ', token);
       // res.redirect(`https://liteseoul.com?query=${String(token)}`) // ======================================================================== URL POINT
-      res.redirect(`http://localhost:3000?query=${String(token)}`);
+      res.redirect(`http://localhost:3000?query=${token.access_token}&id=${token.payload.id}`);
     });
     // access_token.then(token => {
     // 	// res.redirect(`http://localhost:3000?query=${String(token)}`)
