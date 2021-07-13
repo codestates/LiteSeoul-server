@@ -59,12 +59,18 @@ export class User extends BaseEntity {
   updated_at?: Date;
 
   // ======================================== 관계 설정
-  @OneToMany(() => Like, (like) => like.user)
+  @OneToMany(() => Like, (like) => like.user, {
+    onDelete: 'CASCADE',
+  })
   like: Like[];
 
-  @OneToMany(() => Visit, (visit) => visit.user)
+  @OneToMany(() => Visit, (visit) => visit.user, {
+    onDelete: 'CASCADE',
+  })
   visit: Visit[];
 
-  @OneToMany(() => Receipt, (receipt) => receipt.user)
+  @OneToMany(() => Receipt, (receipt) => receipt.user, {
+    onDelete: 'CASCADE',
+  })
   receipt: Receipt[];
 }
