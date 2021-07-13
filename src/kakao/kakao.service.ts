@@ -50,6 +50,7 @@ export class KakaoService {
       const newUser = await this.userRepository.findOne({
         where: { snsId: id },
       });
+      console.log('=========', newUser.id);
       return newUser.id;
     } else {
       return user.id;
