@@ -12,9 +12,9 @@ export class KakaoController {
     const { kakaoToken } = body;
     await this.kakaoService.setToken(kakaoToken);
     let info = await this.kakaoService.info();
-    await this.kakaoService.addNewUser(info.data);
-    const access_token = await this.kakaoService.getToken(info.data.id);
-    const payload = { id: info.data.id };
+    const id = await this.kakaoService.addNewUser(info.data);
+    const access_token = await this.kakaoService.getToken(id);
+    const payload = { id };
     return { access_token, payload };
   }
 
