@@ -267,14 +267,13 @@ export class ShopService {
     let arrangedVisitList;
 
     // 방문 데이터 목록
-    visitList = await getRepository(Visit)
-      .createQueryBuilder('visit')
-      .innerJoinAndSelect("visit.shop", "shop")
+    visitList = await getRepository(Like)
+      .createQueryBuilder('like')
+      .innerJoinAndSelect("like.shop", "shop")
       .select([
-        'visit.id',
-        'visit.userId',
-        'visit.shopId',
-        'visit.visitCnt',
+        'like.id',
+        'like.userId',
+        'like.shopId',
         'shop.id',
         'shop.imgPath',
         'shop.name',
@@ -291,7 +290,6 @@ export class ShopService {
       ])
       .where({
         userId: userId,
-        isAdmitted: 1
       })
       .getMany();
     
