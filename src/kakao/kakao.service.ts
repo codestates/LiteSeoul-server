@@ -46,6 +46,13 @@ export class KakaoService {
         salt,
       };
       await this.userRepository.save(result);
+
+      const newUser = await this.userRepository.findOne({
+        where: { snsId: id },
+      });
+      return newUser.id;
+    } else {
+      return user.id;
     }
   }
 
