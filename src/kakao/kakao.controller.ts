@@ -14,7 +14,8 @@ export class KakaoController {
     let info = await this.kakaoService.info();
     await this.kakaoService.addNewUser(info.data);
     const access_token = await this.kakaoService.getToken(info.data.id);
-    return access_token;
+    const payload = { id: info.data.id };
+    return { access_token, payload };
   }
 
   @Get('logout')

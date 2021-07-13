@@ -179,7 +179,8 @@ export class UserService {
         <br> 
         <br> <h2>"우리가 기억합니다, 당신의 제로 웨이스트(Zero Waste)"</h2>
         <br>제로 웨이스트 샵에서 구매한 영수증 혹은 인증샷을 올려주세요!
-        <br>점수를 산정하여 매 달 상위권에 계신 분들의 명의로 서울시내 결식아동 구호관련 기부를 진행합니다 ;)`, // html body
+        <br>점수를 산정하여 매 달 상위권에 계신 분들의 명의로 서울시내 결식아동 구호관련 기부를 진행합니다 ;)
+        <br> <a href="https://liteseoul.com/">Lite Seoul로 이동하기</a>`, // html body
       });
 
       console.log('Message sent: %s', info.messageId);
