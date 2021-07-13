@@ -291,6 +291,7 @@ export class ShopService {
       .where({
         userId: userId,
       })
+      .orderBy('like.id', 'DESC')
       .getMany();
     
     // 방문 수로 sorting
