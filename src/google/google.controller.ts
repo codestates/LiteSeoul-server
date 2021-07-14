@@ -17,7 +17,6 @@ export class GoogleController {
   async googleAuthRedirect(@Req() req, @Res() res) {
     console.log('=== controller ::: google login on going');
 
-    // this.googleService.googleLogin(req);
     await this.googleService.setToken(req.user.accessToken); // 구글에서 받아온 토큰을 셋?
     await this.googleService.addNewUser(req.user); // 리턴값 필요?
     await this.googleService.getToken(req.user.email).then((token) => {
@@ -25,10 +24,6 @@ export class GoogleController {
       // res.redirect(`https://liteseoul.com?query=${String(token)}`) // ======================================================================== URL POINT
       res.redirect(`http://localhost:3000?query=${token.access_token}&id=${token.payload.id}`);
     });
-    // access_token.then(token => {
-    // 	// res.redirect(`http://localhost:3000?query=${String(token)}`)
-    // 	res.redirect(`http://liteseoul.com?query=${String(token)}`)
-    // })
   }
 
   // 구글 로그아웃

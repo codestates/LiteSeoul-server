@@ -13,21 +13,6 @@ export class GoogleService {
     private jwtService: JwtService,
   ) {}
 
-  // 구글 로그인 클릭
-  // googleLogin(req) {
-  // 	console.log("=== GET  /google/auth/google/callback")
-  // 	console.log("=== accessToken :", req.user.accessToken)
-
-  // 	if (!req.user) {
-  // 		return 'no user from gogole'
-  // 	}
-
-  // 	// 구글에서 넘겨받은 accessToken 셋팅!
-  // 	this.setToken(req.user.accessToken)
-
-  // 	return;
-  // }
-
   // 토큰 셋팅하기
   setToken(token: string): boolean {
     console.log('=== setting google token in service :::', token);
@@ -88,7 +73,7 @@ export class GoogleService {
       .getOne();
 
     const id = user.id;
-    const access_token = await this.jwtService.sign({ id });
+    const access_token = await this.jwtService.sign({ id }); // accessToken 생성
     const payload = { id };
     console.log('=== new access_token in service :::', access_token);
     return { access_token, payload };
@@ -97,10 +82,6 @@ export class GoogleService {
   // 구글 로그아웃
   async googleLogout(): Promise<any> {
     const _url = `https://accounts.google.com/o/oauth2/revoke?token=${this.accessToken}`;
-    // const _url = 'https://mail.google.com/mail/u/0/?logout&hl=en';
-    // const _header = {
-    //   Authorization: `bearer ${this.accessToken}`,
-    // };
     return await this.httpService.post(_url).toPromise();
   }
 }
