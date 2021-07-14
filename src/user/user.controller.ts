@@ -25,18 +25,23 @@ export class UserController {
   // 랭킹: 사용자
   @Get('rank')
   getRank() {
+    console.log(`=== Get  /user/rank`);
     return this.userService.getRank();
   }
 
   // 유저 정보
   @Post('get')
   async getOne(@Body() body) {
+    console.log(`=== Post  /user/get`);
+    console.log(`=== @Body() ${body}`);
     return this.userService.getOne(body.access_token);
   }
 
   // 로그인
   @Post('signin')
   signIn(@Body() body) {
+    console.log(`=== Post  /user/signin`);
+    console.log(`=== @Body() ${body}`);
     return this.userService.signIn(body);
   }
 
@@ -56,6 +61,8 @@ export class UserController {
   )
   @Post('signup')
   signUp(@Body() body, @UploadedFile() file: Express.Multer.File) {
+    console.log(`=== Post  /user/signup`);
+    console.log(`=== @Body() ${body}, @UploadedFile() ${file}`);
     return this.userService.signUp(body, file);
   }
 
@@ -75,18 +82,24 @@ export class UserController {
   )
   @Post('update')
   update(@Body() body, @UploadedFile() file: Express.Multer.File) {
+    console.log(`=== Post  /user/update`);
+    console.log(`=== @Body() ${body}, @UploadedFile() ${file}`);
     return this.userService.update(body, file);
   }
 
   // 회원정보 변경 (이미지 없이)
   @Post('changeinfo')
   changeinfo(@Body() body) {
+    console.log(`=== Post  /user/changeinfo`);
+    console.log(`=== @Body() ${body}`);
     return this.userService.changeinfo(body);
   }
 
   // 회원탈퇴
   @Post('delete')
   delete(@Body() body) {
+    console.log(`=== Post  /user/delete`);
+    console.log(`=== @Body() ${body}`);
     return this.userService.delete(body.access_token);
   }
 }

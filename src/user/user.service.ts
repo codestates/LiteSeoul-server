@@ -25,7 +25,6 @@ export class UserService {
     try {
       const target = await this.jwtService.verify(token);
       const { id } = target;
-      console.log(id);
       const user = await this.userRepository.findOne({ id });
       const { password, salt, ...result } = user;
       return result;
@@ -63,9 +62,7 @@ export class UserService {
       if (user.password === hashedPaword) {
         let { password, ...payload } = user;
         const id = user.id;
-        console.log(id);
         const access_token = this.jwtService.sign({ id });
-        console.log(this.jwtService.verify(access_token));
         return { access_token, payload };
       }
     } catch (err) {
@@ -86,7 +83,6 @@ export class UserService {
       const salt = await bcrypt.genSalt(); // 솔트
       const hashedPaword = await bcrypt.hash(password, salt);
       const profileImgPath = `${process.env.SERVER_URL}uploads/${File.originalname}`;
-      console.log(profileImgPath);
       const result = {
         email,
         password: hashedPaword,
@@ -186,8 +182,7 @@ export class UserService {
         <br> <a href="https://liteseoul.com/">Lite Seoul로 이동하기</a>`, // html body
       });
 
-      console.log('Message sent: %s', info.messageId);
-      console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+      console.log('이메일 전송');
     } catch (err) {
       console.error(err);
     }
