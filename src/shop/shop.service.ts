@@ -60,26 +60,6 @@ export class ShopService {
         return b['likeLength'] - a['likeLength'];
       });
 
-      // let cntManyCustomer;
-      // let cntPerCustomer;
-
-      // rankedList = shopList.map(el => {
-      //   // 샵에 방문한 사용자 수
-      //   cntManyCustomer = el.visit.length;
-      //   // 샵에 방문한 모든 사용자가 방문한 횟수
-      //   cntPerCustomer = el.visit.reduce((acc, cur) => {
-      //     return acc + cur.visitCnt;
-      //   }, 0);
-
-      //   // 샵에 totalPoint 추가
-      //   el["totalPoint"] = cntManyCustomer + cntPerCustomer;
-      //   return el;
-      // })
-
-      // // 결과 재배열
-      // rankedList.sort((a, b) => {
-      //   return b['totalPoint'] - a['totalPoint'];
-      // })
     } catch (e) {
       throw e;
     }
@@ -144,21 +124,21 @@ export class ShopService {
         entityManager
           .query(
             `SELECT
-              c.id,
-              c.userId,
-              c.shopId,
-              c.comment,
-              c.created_at,
-              c.updated_at,
-              u.email,
-              u.name,
-              u.nick
-          FROM
-              comment AS c,
-              user AS u
-          WHERE c.shopId = ${Number(id)} 
-          AND c.userId = u.id
-          ORDER BY c.id DESC`,
+                c.id,
+                c.userId,
+                c.shopId,
+                c.comment,
+                c.created_at,
+                c.updated_at,
+                u.email,
+                u.name,
+                u.nick
+            FROM
+                comment AS c,
+                user AS u
+            WHERE c.shopId = ${Number(id)} 
+            AND c.userId = u.id
+            ORDER BY c.id DESC`,
           )
           .then((data) => {
             return data;
@@ -310,7 +290,7 @@ export class ShopService {
   async likeToggle(likeInfo) {
     const { userId, shopId } = likeInfo;
     console.log('=== POST  /shop/like');
-    console.log(`=== @Body()  ${userId}, ${shopId}`);
+    console.log(`--- @Body()  userId: ${userId}, shopId: ${shopId}`);
 
     let likeHistory; // 좋아요 기록
 
@@ -350,7 +330,7 @@ export class ShopService {
   async writeComment(commentInfo) {
     const { userId, shopId, comment } = commentInfo;
     console.log('=== POST  /shop/comment');
-    console.log(`=== @Body()  ${userId}, ${shopId}, ${comment}`);
+    console.log(`--- @Body()  userId: ${userId}, shopId: ${shopId}, comment: ${comment}`);
 
     let tmpComment; // 입력된 댓글 임시 정보(id만 포함)
     let writtenComment; // 입력된 댓글 전체 정보
@@ -368,21 +348,21 @@ export class ShopService {
       await entityManager
         .query(
           `SELECT
-            c.id,
-            c.userId,
-            c.shopId,
-            c.comment,
-            c.created_at,
-            c.updated_at,
-            u.email,
-            u.name,
-            u.nick
-        FROM
-            comment AS c,
-            user AS u
-        WHERE c.id = ${tmpComment.raw.insertId} 
-        AND c.userId = u.id
-        limit 1`,
+              c.id,
+              c.userId,
+              c.shopId,
+              c.comment,
+              c.created_at,
+              c.updated_at,
+              u.email,
+              u.name,
+              u.nick
+          FROM
+              comment AS c,
+              user AS u
+          WHERE c.id = ${tmpComment.raw.insertId} 
+          AND c.userId = u.id
+          limit 1`,
         )
         .then((data) => {
           writtenComment = data[0];
@@ -395,59 +375,15 @@ export class ShopService {
     return writtenComment;
   }
 
+
   // ======================================================================== 샵 추천 ::: POST  /shop/recommend  :::  랜덤 추천 || 사용자 취향에 따른 추천
   async getShopsByRecommend(userInfo) {
-    const { latitude, longitude, userId } = userInfo;
+    const { latitude, longitude } = userInfo;
     console.log('=== POST  /shop/recommend');
-    console.log(`=== @Body()  ${latitude}, ${longitude}, ${userId}`);
+    console.log(`--- @Body()  latitude: ${latitude}, longitude: ${longitude}`);
 
     let result: any = {}; // 결과값
-    // 사용자 위치 위도 경도 => 위치 기반 추천 시스템
-
-    // visit 테이블에 사용자가 방문한 이력이 있으면
-    // => 해당 샵의 recommend와 같은 샵을 카테고리별로 2개씩 랜덤으로 추천
-    // 방문 이력 없으면 -> 그냥 카테고리별로 2개씩 랜덤으로 추천
-
-    // 사용자가 방문한 이력
-    // let userVisit = await getRepository(Visit)
-    //  .createQueryBuilder("visit")
-    //  .leftJoinAndSelect("visit.shop", "shopList")
-    //  // .select(["userId", "shopId", "visitCnt"])
-    //  .where({ userId: userId })
-    //  .getMany();
-
-    // if (userVisit.length === 0) {
-    //  console.log('없음!!!!!!!!!!!!!!!!!!!!!!!!!!')
-    // } else {
-    // }
-    // 랜덤 추천
-    // let nearShop;
-    // let recycleShop;
-    // let antiPlasticShop;
-    // let antiChemicalShop;
-
-    // 사용자가 좋아요 누름
-    // let userLike = await getRepository(Like)
-    //  .createQueryBuilder("like")
-    //  .leftJoinAndSelect("like.shop", "shopList")
-    //  // .select(["userId", "shopId"])
-    //  .where({ userId: userId })
-    //  .getMany();
-
-    // // 사용자가 방문한 샵 정보
-    // let visitShopList = userVisit.map(el => {
-    //  delete el.shop.created_at;
-    //  delete el.shop.updated_at;
-    //  return el.shop;
-    // });
-
-    // // 사용자가 좋아요 누른 샵 정보
-    // let likeShopList = userLike.map(el => {
-    //  delete el.shop.created_at;
-    //  delete el.shop.updated_at;
-    //  return el.shop;
-    // });
-
+    
     const entityManager = getManager();
 
     let nearRecPlaChe; // nearest[0], recycle[1], antiPlastic[2], antiChemical[3] 데이터
@@ -458,24 +394,24 @@ export class ShopService {
         entityManager
           .query(
             `SELECT 
-              id,
-              imgPath,
-              name,
-              address,
-              text,
-              latitude,
-              longitude,
-              email,
-              phone,
-              regisNumber,
-              category,
-              recommend,
-              isAdmitted,
-              (6371*acos(cos(radians(${latitude}))*cos(radians(latitude))*cos(radians(longitude)-radians(${longitude}))+sin(radians(${latitude}))*sin(radians(latitude)))) AS distance 
-          FROM shop
-          WHERE isAdmitted = 1
-          ORDER BY distance
-          ASC LIMIT 1;`,
+                id,
+                imgPath,
+                name,
+                address,
+                text,
+                latitude,
+                longitude,
+                email,
+                phone,
+                regisNumber,
+                category,
+                recommend,
+                isAdmitted,
+                (6371*acos(cos(radians(${latitude}))*cos(radians(latitude))*cos(radians(longitude)-radians(${longitude}))+sin(radians(${latitude}))*sin(radians(latitude)))) AS distance 
+            FROM shop
+            WHERE isAdmitted = 1
+            ORDER BY distance
+            ASC LIMIT 1;`,
           )
           .then((data) => data[0]),
 
@@ -576,6 +512,7 @@ export class ShopService {
     return result;
   }
 
+
   // ======================================================================== 샵 등록 ::: POST  /shop/register
   async registerShop(shopInfo, file) {
     const {
@@ -587,12 +524,17 @@ export class ShopService {
       recommend,
       text,
     } = shopInfo;
+
     console.log('=== POST  /shop/register');
-    console.log(
-      `=== @Body()  ${storeName}, ${address}, ${marketNum}, ${storeEmail}, ${category}, ${recommend}, ${text}`,
-    );
+    console.log(`--- @Body()  storeName: ${storeName}, address: ${address}, marketNum: ${marketNum}, storeEmail: ${storeEmail}, category: ${category}, recommend: ${recommend}, text: ${text}`);
+
+    // 이메일 보내기
     this.userService.sendMail(storeEmail, storeName);
+
+    // 추가된 샵
     let insertedShop;
+
+    // 샵 이미지 경로
     const shopImgPath = `${process.env.SERVER_URL}uploads/shops/${file.originalname}`;
 
     try {
