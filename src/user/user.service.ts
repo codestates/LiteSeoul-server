@@ -10,11 +10,13 @@ import * as bcrypt from 'bcrypt';
 
 import { User } from '../models/user.model';
 import { JwtService } from '@nestjs/jwt';
+import { Like } from 'src/models/like.model';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(Like) private likeRepository: Repository<Like>,
     private jwtService: JwtService,
   ) {}
 
@@ -139,6 +141,7 @@ export class UserService {
   // 회원탈퇴
   async delete(token) {
     const user = await this.getOne(token);
+    await this.likeRepository.delete({ userId: user.id });
     await this.userRepository.delete({ id: user.id });
     return { message: '정상적으로 탈퇴되었습니다.' };
   }
