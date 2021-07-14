@@ -6,10 +6,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { User } from 'src/models/user.model';
 import { UserService } from 'src/user/user.service';
+import { Like } from 'src/models/like.model';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Receipt, User]),
+    TypeOrmModule.forFeature([Receipt, User, Like]),
     JwtModule.register({
       secretOrPrivateKey: process.env.JWT_CONSTANTS,
       signOptions: { expiresIn: '1h' },
