@@ -3,7 +3,6 @@ import { Shop } from 'src/models/shop.model';
 import { getManager, getRepository } from 'typeorm';
 import { Like } from 'src/models/like.model';
 import { Comment } from 'src/models/comment.model';
-import { Visit } from 'src/models/visit.model';
 import { UserService } from 'src/user/user.service';
 
 @Injectable()

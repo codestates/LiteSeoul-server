@@ -1,7 +1,6 @@
 import { Body, Controller, Get, Param, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { Shop } from 'src/models/shop.model';
 import { ShopService } from './shop.service';
-import fs from 'fs';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 
@@ -63,7 +62,7 @@ export class ShopController {
     FileInterceptor('storeImg', {
       storage: diskStorage({
         destination(req, file, cb) {
-          cb(null, 'uploads/');
+          cb(null, 'uploads/shops/');
         },
         filename(req, file, cb) {
           cb(null, file.originalname);
