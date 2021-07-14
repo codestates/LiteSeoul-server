@@ -8,21 +8,19 @@ export class KakaoController {
 
   @Post('login')
   async kakaoLogin(@Body() body) {
-    console.log(body);
+    console.log(`=== POST  /kakao/login`);
+    console.log(`=== @Body() ${body}`);
     const { kakaoToken } = body;
     await this.kakaoService.setToken(kakaoToken);
     let info = await this.kakaoService.info();
     const id = await this.kakaoService.addNewUser(info.data);
     const access_token = await this.kakaoService.getToken(info.data.id);
-    console.log(id);
     const payload = { id };
     return { access_token, payload };
   }
 
   @Get('logout')
   kakaologout(@Res() res): void {
-    console.log(`LOGOUT TOKEN : ${this.kakaoService.accessToken}`);
-    // 로그아웃
     this.kakaoService
       .logout()
       .then((e) => {
@@ -34,7 +32,6 @@ export class KakaoController {
         `);
       })
       .catch((e) => {
-        console.log(e);
         return res.send('DELETE ERROR');
       });
   }

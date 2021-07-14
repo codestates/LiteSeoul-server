@@ -46,7 +46,6 @@ export class ReceiptService {
         'kor',
       );
       const line = result.data.text.split(`\n`);
-      console.log('======', line);
       const sentence = line.find(
         (data) =>
           (data.includes('사') ||
@@ -77,7 +76,6 @@ export class ReceiptService {
       imgName: file.originalname,
       shopNumber: Number(number),
     };
-    // console.log('--------', receipt);
     await this.receiptRepository.save(receipt);
     let { level, currentExp, maxExp } = user;
     currentExp = currentExp + 50;
@@ -87,7 +85,6 @@ export class ReceiptService {
       currentExp = 0;
     }
     const update = { level, maxExp, currentExp };
-    // console.log({ ...user, ...update });
     await this.userRepository.save({ ...user, ...update });
 
     return { receipt, user: { ...user, ...update } };
