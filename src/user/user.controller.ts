@@ -41,7 +41,6 @@ export class UserController {
   @Post('signin')
   signIn(@Body() body) {
     console.log(`=== Post  /user/signin`);
-    console.log(`=== @Body() ${body}`);
     return this.userService.signIn(body);
   }
 
