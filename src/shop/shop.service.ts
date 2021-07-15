@@ -40,10 +40,7 @@ export class ShopService {
           'like.userId',
           'like.shopId',
         ])
-        .where({
-          isAdmitted: 1,
-        })
-        .take(10)
+        .take(15)
         .orderBy('like.id', 'DESC')
         .getMany();
 
@@ -59,12 +56,13 @@ export class ShopService {
       rankedList.sort((a, b) => {
         return b['likeLength'] - a['likeLength'];
       });
+      
 
     } catch (e) {
       throw e;
     }
 
-    return rankedList;
+    return rankedList.slice(0,9);
   }
 
   // ======================================================================== 샵 상세조회 ::: GET  /shop/:id
