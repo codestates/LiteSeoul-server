@@ -21,7 +21,6 @@ export class ReceiptController {
   @Post('list')
   async get(@Body() body) {
     console.log(`=== POST  /receipt/list`);
-    console.log(`=== @Body() ${body}`);
     try {
       const target = await this.jwtService.verify(body.access_token);
       console.log(target.id);
@@ -46,14 +45,12 @@ export class ReceiptController {
   @Post('add')
   async add(@Body() body, @UploadedFile() file: Express.Multer.File) {
     console.log(`=== POST  /receipt/add`);
-    console.log(`=== @Body() ${body}, @UploadedFile() ${file}`);
     return this.receiptService.add(body, file);
   }
 
   @Post('delete')
   async delete(@Body() body) {
     console.log(`=== POST  /receipt/delete`);
-    console.log(`=== @Body() ${body}`);
     try {
       const target = body.name;
       return this.receiptService.delete(target);

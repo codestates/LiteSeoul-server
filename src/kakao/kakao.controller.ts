@@ -9,7 +9,6 @@ export class KakaoController {
   @Post('login')
   async kakaoLogin(@Body() body) {
     console.log(`=== POST  /kakao/login`);
-    console.log(`=== @Body() ${body}`);
     const { kakaoToken } = body;
     await this.kakaoService.setToken(kakaoToken);
     let info = await this.kakaoService.info();
