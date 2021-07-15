@@ -33,7 +33,6 @@ export class UserController {
   @Post('get')
   async getOne(@Body() body) {
     console.log(`=== Post  /user/get`);
-    console.log(`=== @Body() ${body}`);
     return this.userService.getOne(body.access_token);
   }
 
@@ -61,7 +60,6 @@ export class UserController {
   @Post('signup')
   signUp(@Body() body, @UploadedFile() file: Express.Multer.File) {
     console.log(`=== Post  /user/signup`);
-    console.log(`=== @Body() ${body}, @UploadedFile() ${file}`);
     return this.userService.signUp(body, file);
   }
 
@@ -82,7 +80,6 @@ export class UserController {
   @Post('update')
   update(@Body() body, @UploadedFile() file: Express.Multer.File) {
     console.log(`=== Post  /user/update`);
-    console.log(`=== @Body() ${body}, @UploadedFile() ${file}`);
     return this.userService.update(body, file);
   }
 
@@ -90,7 +87,6 @@ export class UserController {
   @Post('changeinfo')
   changeinfo(@Body() body) {
     console.log(`=== Post  /user/changeinfo`);
-    console.log(`=== @Body() ${body}`);
     return this.userService.changeinfo(body);
   }
 
@@ -98,7 +94,6 @@ export class UserController {
   @Post('delete')
   delete(@Body() body) {
     console.log(`=== Post  /user/delete`);
-    console.log(`=== @Body() ${body}`);
     return this.userService.delete(body.access_token);
   }
 }
