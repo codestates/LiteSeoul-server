@@ -30,7 +30,7 @@ export class GoogleService {
       userInfo = await getRepository(User)
         .createQueryBuilder('user')
         .select()
-        .where({ email: data.email })
+        .where({ snsId: data.email })
         .getOne();
 
       // 사용자가 없으면? 추가!
@@ -43,14 +43,13 @@ export class GoogleService {
           .into(User)
           .values([
             {
-              email: data.email,
               name: data.firstName + data.lastName,
               nick: data.firstName + data.lastName,
               profileImgPath: data.picture,
               salt,
               password: hashedPaword,
               maxExp: 500,
-              snsId: 'google',
+              snsId: data.email,
             },
           ])
           .execute();
