@@ -43,7 +43,7 @@ export class ShopService {
         .where({
           isAdmitted: 1,
         })
-        .take(9)
+        .take(10)
         .orderBy('like.id', 'DESC')
         .getMany();
 
