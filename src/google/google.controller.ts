@@ -21,8 +21,8 @@ export class GoogleController {
     await this.googleService.addNewUser(req.user); // 리턴값 필요?
     await this.googleService.getToken(req.user.email).then((token) => {
       console.log('=== accesstoken ::: ', token);
-      // res.redirect(`https://liteseoul.com?query=${String(token)}`) // ======================================================================== URL POINT
-      res.redirect(`http://localhost:3000?query=${token.access_token}&id=${token.payload.id}`);
+      res.redirect(`https://liteseoul.com?query=${token.access_token}&id=${token.payload.id}`) // ======================================================================== URL POINT
+      // res.redirect(`http://localhost:3000?query=${token.access_token}&id=${token.payload.id}`);
     });
   }
 
