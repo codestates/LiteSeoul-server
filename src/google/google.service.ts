@@ -43,7 +43,7 @@ export class GoogleService {
           .into(User)
           .values([
             {
-              // email: data.email,
+              email: data.email,
               name: data.firstName + data.lastName,
               nick: data.firstName + data.lastName,
               profileImgPath: data.picture,
