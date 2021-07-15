@@ -19,33 +19,6 @@ export class ShopService {
     let rankedList;
 
     try {
-      // shopList = await getRepository(Like)
-      //   .createQueryBuilder('like')
-      //   .leftJoinAndSelect('like.shop', 'shop')
-      //   .select([
-      //     'shop.id',
-      //     'shop.imgPath',
-      //     'shop.name',
-      //     'shop.address',
-      //     'shop.text',
-      //     'shop.latitude',
-      //     'shop.longitude',
-      //     'shop.email',
-      //     'shop.phone',
-      //     'shop.regisNumber',
-      //     'shop.category',
-      //     'shop.recommend',
-      //     'shop.isAdmitted',
-      //     'like.id',
-      //     'like.userId',
-      //     'like.shopId',
-      //   ])
-      //   .where({
-      //     isAdmitted: 1,
-      //   })
-      //   .take(9)
-      //   .getMany();
-
       shopList = await getRepository(Shop)
         .createQueryBuilder('shop')
         .innerJoinAndSelect('shop.like', 'like')
