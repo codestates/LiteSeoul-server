@@ -68,7 +68,7 @@ export class GoogleService {
     const user = await getRepository(User)
       .createQueryBuilder('user')
       .select()
-      .where({ email })
+      .where({ snsId: email })
       .getOne();
 
     const id = user.id;
