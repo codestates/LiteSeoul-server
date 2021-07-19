@@ -9,6 +9,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { readdirSync, mkdirSync } from 'fs';
 import { diskStorage } from 'multer';
+import path from 'path';
 import { UserService } from './user.service';
 
 try {
@@ -95,5 +96,23 @@ export class UserController {
   delete(@Body() body) {
     console.log(`=== Post  /user/delete`);
     return this.userService.delete(body.access_token);
+
+  @UseInterceptors(
+    FileInterceptor('UserImg', {
+      storage: diskStorage({
+        destination(req, file, cb) {
+          cb(null, 'uploads/');
+        },
+        filename(req, file, cb) {
+          const ext = path.extname(file.originalname);
+          cb(null, path.basename(file.originalname, ext) + Date.now() + ext);
+        },
+      }),
+      limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+    }),
+  )
+  @Post('signup')
+  signUp(@UploadedFile() file: Express.Multer.File) {
+    return file;
   }
 }
