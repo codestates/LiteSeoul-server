@@ -10,11 +10,13 @@ import * as bcrypt from 'bcrypt';
 
 import { User } from '../models/user.model';
 import { JwtService } from '@nestjs/jwt';
+import { Like } from 'src/models/like.model';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(Like) private likeRepository: Repository<Like>,
     private jwtService: JwtService,
   ) {}
 
@@ -23,7 +25,6 @@ export class UserService {
     try {
       const target = await this.jwtService.verify(token);
       const { id } = target;
-      console.log(id);
       const user = await this.userRepository.findOne({ id });
       const { password, salt, ...result } = user;
       return result;
@@ -61,9 +62,7 @@ export class UserService {
       if (user.password === hashedPaword) {
         let { password, ...payload } = user;
         const id = user.id;
-        console.log(id);
         const access_token = this.jwtService.sign({ id });
-        console.log(this.jwtService.verify(access_token));
         return { access_token, payload };
       }
     } catch (err) {
@@ -84,7 +83,6 @@ export class UserService {
       const salt = await bcrypt.genSalt(); // 솔트
       const hashedPaword = await bcrypt.hash(password, salt);
       const profileImgPath = `${process.env.SERVER_URL}uploads/${File.originalname}`;
-      console.log(profileImgPath);
       const result = {
         email,
         password: hashedPaword,
@@ -139,6 +137,7 @@ export class UserService {
   // 회원탈퇴
   async delete(token) {
     const user = await this.getOne(token);
+    await this.likeRepository.delete({ userId: user.id });
     await this.userRepository.delete({ id: user.id });
     return { message: '정상적으로 탈퇴되었습니다.' };
   }
@@ -149,18 +148,19 @@ export class UserService {
       const nodemailer = require('nodemailer');
 
       let transporter = nodemailer.createTransport({
-        service: 'gmail',
+        service: 'Naver',
         host: 'smtp.naver.com',
         port: 587,
         secure: false, // true for 465, false for other ports
         auth: {
-          user: 'wjdxo5307@gmail.com', // generated ethereal user
-          pass: 'wjdxo123', // generated ethereal password
+          user: process.env.MAIL_EMAIL, // generated ethereal user
+          pass: process.env.MAIL_PASSWORD, // generated ethereal password
         },
+        tls: { rejectUnauthorized: false },
       });
 
       let info = await transporter.sendMail({
-        from: 'wjdxo5307@gmail.com', // sender address
+        from: process.env.MAIL_EMAIL, // sender address
         to: `${email}`, // list of receivers
         subject: `${name}님 환경 지키기에 동참해주셔서 감사합니다.`, // Subject line
         text: '[변수명 : 고객 이름이나 닉네임] 님 환경 지키기에 동참해주셔서 감사합니다.', // plain text body
@@ -178,11 +178,11 @@ export class UserService {
         <br> 
         <br> <h2>"우리가 기억합니다, 당신의 제로 웨이스트(Zero Waste)"</h2>
         <br>제로 웨이스트 샵에서 구매한 영수증 혹은 인증샷을 올려주세요!
-        <br>점수를 산정하여 매 달 상위권에 계신 분들의 명의로 서울시내 결식아동 구호관련 기부를 진행합니다 ;)`, // html body
+        <br>점수를 산정하여 매 달 상위권에 계신 분들의 명의로 서울시내 결식아동 구호관련 기부를 진행합니다 ;)
+        <br> <a href="https://liteseoul.com/">Lite Seoul로 이동하기</a>`, // html body
       });
 
-      console.log('Message sent: %s', info.messageId);
-      console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+      console.log('이메일 전송');
     } catch (err) {
       console.error(err);
     }

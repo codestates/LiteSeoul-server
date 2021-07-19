@@ -13,6 +13,7 @@ import { KakaoModule } from './kakao/kakao.module';
 import { ShopModule } from './shop/shop.module';
 import { ConfigModule } from '@nestjs/config';
 import { ReceiptModule } from './receipt/receipt.module';
+import { GoogleModule } from './google/google.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { ReceiptModule } from './receipt/receipt.module';
     KakaoModule,
     ShopModule,
     ReceiptModule,
+    GoogleModule,
   ],
   controllers: [AppController],
   providers: [AppService],

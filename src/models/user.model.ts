@@ -43,7 +43,7 @@ export class User extends BaseEntity {
   @Column()
   profileText?: string;
 
-  @Column()
+  @Column({default: 1})
   level?: number;
 
   @Column()
@@ -59,12 +59,18 @@ export class User extends BaseEntity {
   updated_at?: Date;
 
   // ======================================== 관계 설정
-  @OneToMany(() => Like, (like) => like.user)
+  @OneToMany(() => Like, (like) => like.user, {
+    cascade: false,
+  })
   like: Like[];
 
-  @OneToMany(() => Visit, (visit) => visit.user)
+  @OneToMany(() => Visit, (visit) => visit.user, {
+    cascade: false,
+  })
   visit: Visit[];
 
-  @OneToMany(() => Receipt, (receipt) => receipt.user)
+  @OneToMany(() => Receipt, (receipt) => receipt.user, {
+    cascade: false,
+  })
   receipt: Receipt[];
 }

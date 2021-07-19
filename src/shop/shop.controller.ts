@@ -1,8 +1,8 @@
 import { Body, Controller, Get, Param, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { Shop } from 'src/models/shop.model';
 import { ShopService } from './shop.service';
-import fs from 'fs';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
 
 
 @Controller('shop')
@@ -57,11 +57,23 @@ export class ShopController {
     return this.shopService.getShopsByRecommend(userInfo);
   }
 
-  // testMulter
-  @Post('image')
-  @UseInterceptors(FileInterceptor('image'))
-  uploadFile(@UploadedFile() file) {
-    console.log(file)
-    return file;
+  // 샵 대표 이미지 저장을 위한 fileInterceptor
+  @UseInterceptors(
+    FileInterceptor('storeImg', {
+      storage: diskStorage({
+        destination(req, file, cb) {
+          cb(null, 'uploads/shops/');
+        },
+        filename(req, file, cb) {
+          cb(null, file.originalname);
+        },
+      }),
+    }),
+  )
+
+  // 샵 등록
+  @Post('register')
+  registerShop(@Body() shopInfo: any, @UploadedFile() file: Express.Multer.File) {
+    return this.shopService.registerShop(shopInfo, file)
   }
 }

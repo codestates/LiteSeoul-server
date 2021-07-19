@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/models/user.model';
 import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class KakaoService {
@@ -34,13 +35,25 @@ export class KakaoService {
     } = data;
     const user = await this.userRepository.findOne({ where: { snsId: id } });
     if (!user) {
+      const salt = await bcrypt.genSalt();
+      const hashedPaword = await bcrypt.hash('0000', salt);
       const result = {
         nick: nickname,
+        name: nickname,
         snsId: id,
         profileImgPath: profile_image,
         maxExp: 500,
+        password: hashedPaword,
+        salt,
       };
       await this.userRepository.save(result);
+
+      const newUser = await this.userRepository.findOne({
+        where: { snsId: id },
+      });
+      return newUser.id;
+    } else {
+      return user.id;
     }
   }
 
